@@ -1,0 +1,70 @@
+required = ["github.com/containerum/kube-client", "github.com/satori/go.uuid"]
+
+[prune]
+    non-go = true
+    go-tests = true
+    unused-packages = true
+
+    [[prune.project]]
+      name = "github.com/containerum/kube-client"
+      non-go = false
+
+    [[prune.project]]
+      name = "github.com/containerum/utils"
+      non-go = false
+
+    [[prune.project]]
+      name = "github.com/containerum/cherry"
+      non-go = false
+
+[[constraint]]
+  name = "github.com/containerum/utils"
+  version = "~1.0.0"
+
+[[constraint]]
+  version = "1.2.0"
+  name = "github.com/gin-gonic/gin"
+
+[[constraint]]
+  name = "github.com/gitsirupsen/logrus"
+  version = "^1.0.5"
+
+[[constraint]]
+  name = "github.com/containerum/kube-client"
+  version = "~0.23.29"
+
+[[constraint]]
+  name = "gopkg.in/go-playground/validator.v9"
+  version = "~9.17.1"
+
+[[constraint]]
+  name = "github.com/go-playground/locales"
+  version = "0.11.2"
+
+[[constraint]]
+  version = "kubernetes-1.9.3"
+  name = "k8s.io/apimachinery"
+
+[[constraint]]
+  name = "github.com/go-resty/resty"
+  version = "^1.6.0"
+
+[[constraint]]
+  name = "github.com/satori/go.uuid"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/json-iterator/go"
+  version = "1.0.5"
+
+[[constraint]]
+  name = "github.com/gin-contrib/cors"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/globalsign/mgo"
+  version = "r2018.04.23"
+
+[[constraint]]
+  name = "github.com/blang/semver"
+  version = "3.5.1"

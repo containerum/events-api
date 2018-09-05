@@ -1,0 +1,123 @@
+Name = "eaerrors"
+SID = "events-api"
+
+[[error]]
+    Name = "ErrDatabase"
+    StatusHTTP = 500
+    Message = "Database error"
+    Kind = 1
+
+[[error]]
+    Name = "ErrResourceNotExists"
+    StatusHTTP = 404
+    Message = "Resource doesn't exist"
+    Kind = 2
+
+[[error]]
+    Name = "ErrResourceAlreadyExists"
+    StatusHTTP = 409
+    Message = "Resource already exists"
+    Kind = 3
+
+[[error]]
+    Name = "ErrPermissionDenied"
+    StatusHTTP = 403
+    Message = "Permission denied"
+    Kind = 4
+
+[[error]]
+    Name = "ErrInternal"
+    StatusHTTP = 500
+    Message = "Internal error"
+    Kind = 5
+
+[[error]]
+    Name = "ErrValidation"
+    StatusHTTP = 400
+    Message = "Validation error"
+    Kind = 6
+
+[[error]]
+    Name = "ErrServiceNotExternal"
+    StatusHTTP = 400
+    Message = "Service is not external"
+    Kind = 7
+
+[[error]]
+    Name = "ErrTCPPortNotFound"
+    StatusHTTP = 400
+    Message = "TCP Port was not found in service"
+    Kind = 8
+
+[[error]]
+    Name = "ErrPortsExhausted"
+    StatusHTTP = 507
+    Message = "Free ports pool for domain exhausted"
+    Kind = 9
+
+[[error]]
+    Name = "ErrServiceHasIngresses"
+    StatusHTTP = 400
+    Message = "Can`t delete service with linked ingresses"
+    Kind = 11
+
+[[error]]
+    Name = "ErrRequiredHeadersNotProvided"
+    StatusHTTP = 400
+    Message = "Required headers not provided"
+    Kind = 12
+
+[[error]]
+    Name = "ErrInvalidRole"
+    StatusHTTP = 403
+    Message = "Invalid user role"
+    Kind = 13
+
+[[error]]
+    Name = "ErrAccessError"
+    StatusHTTP = 403
+    Message = "Access denied"
+    Kind = 14
+
+[[error]]
+    Name = "ErrAdminRequired"
+    StatusHTTP = 403
+    Message = "Admin access required"
+    Comment = "User is not admin and has no permissions"
+    Kind = 15
+
+[[error]]
+    Name = "ErrQuotaExceeded"
+    StatusHTTP = 400
+    Message = "Project quota exceeded"
+    Kind = 16
+
+[[error]]
+    Name = "ErrNoContainer"
+    StatusHTTP = 404
+    Message = "Container with this name is not found in deployment"
+    Kind = 17
+
+[[error]]
+    Name = "ErrUnableCountResources"
+    StatusHTTP = 500
+    Message = "Unable to count resources"
+    Kind = 18
+
+[[error]]
+    Name = "ErrUnableDeleteActiveDeploymentVersion"
+    StatusHTTP = 400
+    Message = "Unable delete active deployment version"
+    Kind = 19
+
+[[error]]
+    Name = "ErrOnlyOneDeploymentVersion"
+    StatusHTTP = 404
+    Message = "Only 1 deployment version exists"
+    Kind = 20
+
+[[error]]
+    Name = "ErrNoDomainsAvailable"
+    StatusHTTP = 404
+    Message = "No domains available"
+    Kind = 21
