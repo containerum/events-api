@@ -1,7 +1,9 @@
 package impl
 
 import (
-	"context"
+	"time"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/containerum/kube-client/pkg/model"
 
@@ -22,32 +24,32 @@ func NewDomainActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 	}
 }
 
-func (ea *EventsActionsImpl) GetDeploymentEvents(ctx context.Context, namespace, deployment string) (*model.EventsList, error) {
-	events, err := ea.mongo.GetDeploymentEventsList(namespace, deployment)
+func (ea *EventsActionsImpl) GetDeploymentEvents(params gin.Params, starttime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetDeploymentEventsList(params.ByName("namespace"), params.ByName("deployment"), starttime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespaceDeploymentsEvents(ctx context.Context, namespace string) (*model.EventsList, error) {
-	events, err := ea.mongo.GetNamespaceDeploymentsEventsList(namespace)
+func (ea *EventsActionsImpl) GetNamespaceDeploymentsEvents(params gin.Params, starttime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetNamespaceDeploymentsEventsList(params.ByName("namespace"), starttime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetPodEvents(ctx context.Context, namespace, pod string) (*model.EventsList, error) {
-	events, err := ea.mongo.GetPodEventsList(namespace, pod)
+func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, starttime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetPodEventsList(params.ByName("namespace"), params.ByName("pod"), starttime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespacePodsEvents(ctx context.Context, namespace string) (*model.EventsList, error) {
-	events, err := ea.mongo.GetNamespacePodsEventsList(namespace)
+func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, starttime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetNamespacePodsEventsList(params.ByName("namespace"), starttime)
 	if err != nil {
 		return nil, err
 	}

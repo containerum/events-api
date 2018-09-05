@@ -74,5 +74,4 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 		events.GET("/pods/:pod", eventsHandlers.GetPodEventsListHandler)
 		events.GET("/pods", eventsHandlers.GetNamespacePodsEventsListHandler)
 	}
-
 }
