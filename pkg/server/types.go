@@ -8,9 +8,9 @@ import (
 )
 
 type EventsActions interface {
-	GetDeploymentEvents(params gin.Params, starttime time.Time) (*model.EventsList, error)
-	GetNamespaceDeploymentsEvents(params gin.Params, starttime time.Time) (*model.EventsList, error)
+	GetDeploymentEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
+	GetNamespaceDeploymentsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
 
-	GetPodEvents(params gin.Params, starttime time.Time) (*model.EventsList, error)
-	GetNamespacePodsEvents(params gin.Params, starttime time.Time) (*model.EventsList, error)
+	GetPodEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
+	GetNamespacePodsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
 }

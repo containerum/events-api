@@ -7,7 +7,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-func (mongo *MongoStorage) GetPodEventsList(namespace, pod string, starttime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetPodEventsList(namespace, pod string, startTime time.Time) ([]model.Event, error) {
 	mongo.logger.Debugf("getting pod events")
 	var collection = mongo.db.C(PodEventsCollection)
 	result := make([]model.Event, 0)
@@ -15,7 +15,7 @@ func (mongo *MongoStorage) GetPodEventsList(namespace, pod string, starttime tim
 		"resourcenamespace": namespace,
 		"resourcename":      pod,
 		"dateadded": bson.M{
-			"$gte": starttime.Format(time.RFC3339),
+			"$gte": startTime.Format(time.RFC3339),
 		},
 	}).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get pod events")
@@ -24,14 +24,14 @@ func (mongo *MongoStorage) GetPodEventsList(namespace, pod string, starttime tim
 	return result, nil
 }
 
-func (mongo *MongoStorage) GetNamespacePodsEventsList(namespace string, starttime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetNamespacePodsEventsList(namespace string, startTime time.Time) ([]model.Event, error) {
 	mongo.logger.Debugf("getting pods events")
 	var collection = mongo.db.C(PodEventsCollection)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
 		"resourcenamespace": namespace,
 		"dateadded": bson.M{
-			"$gte": starttime.Format(time.RFC3339),
+			"$gte": startTime.Format(time.RFC3339),
 		},
 	}).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get namespace pods events")
