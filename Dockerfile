@@ -11,6 +11,6 @@ ENV CH_RESOURCE_DEBUG="true" \
     CH_RESOURCE_TEXTLOG="true" \
     CH_RESOURCE_MONGO_ADDR="http://mongo:27017"
 
-EXPOSE 1213
+EXPOSE 1667
 
-CMD "/resource-service"
+CMD "/events-api"
