@@ -2,14 +2,6 @@
 
 
 [[projects]]
-  branch = "develop"
-  digest = "1:219f3f5f50ca87c92433f40c1c02ab06a64209f7b7eae30ea91e8ed6b4ee4698"
-  name = "git.containerum.net/ch/resource-service"
-  packages = ["pkg/models/domain"]
-  pruneopts = "NUT"
-  revision = "496b2a91d92fc5abdecfe3e6f27646f21de8d3c3"
-
-[[projects]]
   digest = "1:d8ebbd207f3d3266d4423ce4860c9f3794956306ded6c7ba312ecc69cdfbf04c"
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
@@ -207,14 +199,6 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:e2b86e41f3d669fc36b50d31d32d22c8ac656c75aa5ea89717ce7177e134ff2a"
-  name = "github.com/golang/glog"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
-
-[[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -273,14 +257,6 @@
   pruneopts = "NUT"
   revision = "2b74bc874f1a8ee6911d655378be9025aeaf6021"
   version = "v0.3.7"
-
-[[projects]]
-  digest = "1:c17f50b4ccbba568a6fc10b06a24bb8ac99077470fd48a905759f9914d631dd7"
-  name = "github.com/oleiade/reflections"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496"
-  version = "v1.0.0"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -348,13 +324,10 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b97884227f0b15b579731be9eafd87d3d143d82715ea14942f8e8e032220f4c4"
+  digest = "1:4c1f9feee12217468aa4dda74a9142bcbb3dd9a37868a12b1f07b91b25d94efd"
   name = "golang.org/x/net"
   packages = [
     "context",
-    "http/httpguts",
-    "http2",
-    "http2/hpack",
     "idna",
     "webdav",
     "webdav/internal/xml",
@@ -433,23 +406,9 @@
   version = "v2.2.1"
 
 [[projects]]
-  digest = "1:99eb121b8949955f16e4a4edd7f33fa02678ebf84edcba050a1b52e617684279"
+  digest = "1:1f0716972e5b4b45446e2d83d6ab0cb0dd52498e5f5d3800a89420ab023fb291"
   name = "k8s.io/apimachinery"
-  packages = [
-    "pkg/api/resource",
-    "pkg/conversion",
-    "pkg/conversion/queryparams",
-    "pkg/runtime",
-    "pkg/runtime/schema",
-    "pkg/util/errors",
-    "pkg/util/json",
-    "pkg/util/net",
-    "pkg/util/runtime",
-    "pkg/util/sets",
-    "pkg/util/wait",
-    "pkg/watch",
-    "third_party/forked/golang/reflect",
-  ]
+  packages = ["pkg/api/resource"]
   pruneopts = "NUT"
   revision = "19e3f5aa3adca672c153d324e6b7d82ff8935f03"
   version = "kubernetes-1.9.3"
@@ -466,7 +425,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "git.containerum.net/ch/resource-service/pkg/models/domain",
     "github.com/containerum/cherry",
     "github.com/containerum/cherry/adaptors/cherrylog",
     "github.com/containerum/cherry/adaptors/gonic",
@@ -483,7 +441,6 @@
     "github.com/go-playground/locales/en_US",
     "github.com/go-playground/universal-translator",
     "github.com/json-iterator/go",
-    "github.com/oleiade/reflections",
     "github.com/satori/go.uuid",
     "github.com/sirupsen/logrus",
     "github.com/stretchr/testify/assert",
@@ -492,7 +449,6 @@
     "gopkg.in/go-playground/validator.v9",
     "gopkg.in/go-playground/validator.v9/translations/en",
     "k8s.io/apimachinery/pkg/api/resource",
-    "k8s.io/apimachinery/pkg/watch",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
