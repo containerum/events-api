@@ -16,7 +16,10 @@ type EventsHandlers struct {
 
 func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetPodEvents)
+		if err := withWS(ctx, h.GetPodEvents); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetPodEvents(ctx.Params, time.Time{})
 		if err != nil {
@@ -29,7 +32,10 @@ func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespacePodsEvents)
+		if err := withWS(ctx, h.GetNamespacePodsEvents); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespacePodsEvents(ctx.Params, time.Time{})
 		if err != nil {
@@ -42,7 +48,10 @@ func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetPVCEventsListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetPVCEvents)
+		if err := withWS(ctx, h.GetPVCEvents); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetPVCEvents(ctx.Params, time.Time{})
 		if err != nil {
@@ -55,7 +64,10 @@ func (h *EventsHandlers) GetPVCEventsListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespacePVCsEventsListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespacePVCsEvents)
+		if err := withWS(ctx, h.GetNamespacePVCsEvents); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespacePVCsEvents(ctx.Params, time.Time{})
 		if err != nil {

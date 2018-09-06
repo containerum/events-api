@@ -9,7 +9,10 @@ import (
 
 func (h *EventsHandlers) GetNamespaceChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespaceChanges)
+		if err := withWS(ctx, h.GetNamespaceChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespaceChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -22,7 +25,10 @@ func (h *EventsHandlers) GetNamespaceChangesListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetDeploymentChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetDeploymentChanges)
+		if err := withWS(ctx, h.GetDeploymentChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetDeploymentChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -35,7 +41,10 @@ func (h *EventsHandlers) GetDeploymentChangesListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespaceDeploymentsChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespaceDeploymentsChanges)
+		if err := withWS(ctx, h.GetNamespaceDeploymentsChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespaceDeploymentsChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -48,7 +57,10 @@ func (h *EventsHandlers) GetNamespaceDeploymentsChangesListHandler(ctx *gin.Cont
 
 func (h *EventsHandlers) GetServiceChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetServiceChanges)
+		if err := withWS(ctx, h.GetServiceChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetServiceChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -61,7 +73,10 @@ func (h *EventsHandlers) GetServiceChangesListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespaceServicesChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespaceServicesChanges)
+		if err := withWS(ctx, h.GetNamespaceServicesChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespaceServicesChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -74,7 +89,10 @@ func (h *EventsHandlers) GetNamespaceServicesChangesListHandler(ctx *gin.Context
 
 func (h *EventsHandlers) GetIngressChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetIngressChanges)
+		if err := withWS(ctx, h.GetIngressChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetIngressChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -87,7 +105,10 @@ func (h *EventsHandlers) GetIngressChangesListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespaceIngressesChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespaceIngressesChanges)
+		if err := withWS(ctx, h.GetNamespaceIngressesChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespaceIngressesChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -100,7 +121,10 @@ func (h *EventsHandlers) GetNamespaceIngressesChangesListHandler(ctx *gin.Contex
 
 func (h *EventsHandlers) GetPVCChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetPVCChanges)
+		if err := withWS(ctx, h.GetPVCChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetPVCChanges(ctx.Params, time.Time{})
 		if err != nil {
@@ -113,7 +137,10 @@ func (h *EventsHandlers) GetPVCChangesListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespacePVCsChangesListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespacePVCsChanges)
+		if err := withWS(ctx, h.GetNamespacePVCsChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
 	} else {
 		resp, err := h.GetNamespacePVCsChanges(ctx.Params, time.Time{})
 		if err != nil {

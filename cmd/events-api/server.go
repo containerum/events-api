@@ -25,7 +25,9 @@ func initServer(c *cli.Context) error {
 	for _, f := range c.GlobalFlagNames() {
 		fmt.Fprintf(w, "Flag: %s\t Value: %s\n", f, c.String(f))
 	}
-	w.Flush()
+	if err := w.Flush(); err != nil {
+		logrus.Debug(err)
+	}
 
 	setupLogs(c)
 

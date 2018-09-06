@@ -28,7 +28,9 @@ func withWS(ctx *gin.Context, getfunc eventsFunc) error {
 		}
 		if len(resp.Events) > 0 {
 			logrus.Infof("Writing %v events", len(resp.Events))
-			c.WriteJSON(resp.Events)
+			if err := c.WriteJSON(resp.Events); err != nil {
+				return err
+			}
 		}
 		time.Sleep(30 * time.Second)
 	}
