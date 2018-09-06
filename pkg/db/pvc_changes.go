@@ -7,26 +7,26 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-func (mongo *MongoStorage) GetPodEventsList(namespace, pod string, startTime time.Time) ([]model.Event, error) {
-	mongo.logger.Debugf("getting pod events")
-	var collection = mongo.db.C(PodEventsCollection)
+func (mongo *MongoStorage) GetPVCChangesList(namespace, pvc string, startTime time.Time) ([]model.Event, error) {
+	mongo.logger.Debugf("getting pvc changes")
+	var collection = mongo.db.C(PVCCollection)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
 		"resourcenamespace": namespace,
-		"resourcename":      pod,
+		"resourcename":      pvc,
 		"dateadded": bson.M{
 			"$gte": startTime.Format(time.RFC3339),
 		},
 	}).All(&result); err != nil {
-		mongo.logger.WithError(err).Errorf("unable to get pod events")
+		mongo.logger.WithError(err).Errorf("unable to get pvc changes")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
 	return result, nil
 }
 
-func (mongo *MongoStorage) GetNamespacePodsEventsList(namespace string, startTime time.Time) ([]model.Event, error) {
-	mongo.logger.Debugf("getting namespace pods events")
-	var collection = mongo.db.C(PodEventsCollection)
+func (mongo *MongoStorage) GetNamespacePVCsChangesList(namespace string, startTime time.Time) ([]model.Event, error) {
+	mongo.logger.Debugf("getting namespace pvcs changes")
+	var collection = mongo.db.C(PVCCollection)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
 		"resourcenamespace": namespace,
@@ -34,7 +34,7 @@ func (mongo *MongoStorage) GetNamespacePodsEventsList(namespace string, startTim
 			"$gte": startTime.Format(time.RFC3339),
 		},
 	}).All(&result); err != nil {
-		mongo.logger.WithError(err).Errorf("unable to get namespace pods events")
+		mongo.logger.WithError(err).Errorf("unable to get namespace pvcs changes")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
 	return result, nil

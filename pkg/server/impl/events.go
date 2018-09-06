@@ -17,27 +17,11 @@ type EventsActionsImpl struct {
 	log   *cherrylog.LogrusAdapter
 }
 
-func NewDomainActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
+func NewEventsActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 	return &EventsActionsImpl{
 		mongo: mongo,
 		log:   cherrylog.NewLogrusAdapter(logrus.WithField("component", "domain_actions")),
 	}
-}
-
-func (ea *EventsActionsImpl) GetDeploymentEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetDeploymentEventsList(params.ByName("namespace"), params.ByName("deployment"), startTime)
-	if err != nil {
-		return nil, err
-	}
-	return &model.EventsList{Events: events}, nil
-}
-
-func (ea *EventsActionsImpl) GetNamespaceDeploymentsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetNamespaceDeploymentsEventsList(params.ByName("namespace"), startTime)
-	if err != nil {
-		return nil, err
-	}
-	return &model.EventsList{Events: events}, nil
 }
 
 func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
@@ -50,6 +34,22 @@ func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, startTime time.Time
 
 func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
 	events, err := ea.mongo.GetNamespacePodsEventsList(params.ByName("namespace"), startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
+func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetPVCEventsList(params.ByName("namespace"), params.ByName("pvc"), startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
+func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetNamespacePVCsEventsList(params.ByName("namespace"), startTime)
 	if err != nil {
 		return nil, err
 	}

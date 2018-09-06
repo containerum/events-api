@@ -1,13 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/containerum/kube-client/pkg/model"
-
-	"github.com/gorilla/websocket"
 
 	m "github.com/containerum/events-api/pkg/router/middleware"
 	"github.com/containerum/events-api/pkg/server"
@@ -17,34 +12,6 @@ import (
 type EventsHandlers struct {
 	server.EventsActions
 	*m.TranslateValidate
-}
-
-type eventsFunc func(gin.Params, time.Time) (*model.EventsList, error)
-
-func (h *EventsHandlers) GetDeploymentEventsListHandler(ctx *gin.Context) {
-	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetDeploymentEvents)
-	} else {
-		resp, err := h.GetDeploymentEvents(ctx.Params, time.Time{})
-		if err != nil {
-			ctx.AbortWithStatusJSON(h.HandleError(err))
-			return
-		}
-		ctx.JSON(http.StatusOK, resp)
-	}
-}
-
-func (h *EventsHandlers) GetNamespaceDeploymentsEventsListHandler(ctx *gin.Context) {
-	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetNamespaceDeploymentsEvents)
-	} else {
-		resp, err := h.GetNamespaceDeploymentsEvents(ctx.Params, time.Time{})
-		if err != nil {
-			ctx.AbortWithStatusJSON(h.HandleError(err))
-			return
-		}
-		ctx.JSON(http.StatusOK, resp)
-	}
 }
 
 func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
@@ -62,7 +29,7 @@ func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
 
 func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, h.GetPodEvents)
+		withWS(ctx, h.GetNamespacePodsEvents)
 	} else {
 		resp, err := h.GetNamespacePodsEvents(ctx.Params, time.Time{})
 		if err != nil {
@@ -73,24 +40,28 @@ func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
 	}
 }
 
-var upgrader = websocket.Upgrader{}
-
-func withWS(ctx *gin.Context, getfunc eventsFunc) error {
-	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	if err != nil {
-		return err
-	}
-	var startTime time.Time
-	for {
-		resp, err := getfunc(ctx.Params, startTime)
-		startTime = time.Now()
+func (h *EventsHandlers) GetPVCEventsListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		withWS(ctx, h.GetPVCEvents)
+	} else {
+		resp, err := h.GetPVCEvents(ctx.Params, time.Time{})
 		if err != nil {
-			return err
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
 		}
-		if len(resp.Events) > 0 {
-			fmt.Printf("Writing %v events\n", len(resp.Events))
-			c.WriteJSON(resp.Events)
+		ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *EventsHandlers) GetNamespacePVCsEventsListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		withWS(ctx, h.GetNamespacePVCsEvents)
+	} else {
+		resp, err := h.GetNamespacePVCsEvents(ctx.Params, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
 		}
-		time.Sleep(30 * time.Second)
+		ctx.JSON(http.StatusOK, resp)
 	}
 }

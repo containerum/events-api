@@ -29,7 +29,7 @@ func CreateRouter(mongo *db.MongoStorage, status *model.ServiceStatus, tv *m.Tra
 	e := gin.New()
 	systemHandlersSetup(e, status, enableCORS)
 	initMiddlewares(e, tv)
-	eventsHandlersSetup(e, tv, impl.NewDomainActionsImpl(mongo))
+	eventsHandlersSetup(e, tv, impl.NewEventsActionsImpl(mongo))
 
 	return e
 }
@@ -66,12 +66,29 @@ func systemHandlersSetup(router gin.IRouter, status *model.ServiceStatus, enable
 func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions) {
 	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv}
 
-	events := router.Group("/events/namespace/:namespace")
+	events := router.Group("/events/namespaces/:namespace")
 	{
-		events.GET("/deployments/:deployment", eventsHandlers.GetDeploymentEventsListHandler)
-		events.GET("/deployments", eventsHandlers.GetNamespaceDeploymentsEventsListHandler)
-
 		events.GET("/pods/:pod", eventsHandlers.GetPodEventsListHandler)
 		events.GET("/pods", eventsHandlers.GetNamespacePodsEventsListHandler)
+
+		events.GET("/pvc/:pvc", eventsHandlers.GetPVCEventsListHandler)
+		events.GET("/pvc", eventsHandlers.GetNamespacePVCsEventsListHandler)
 	}
+	changes := router.Group("/changes/namespaces/:namespace")
+	{
+		changes.GET("", eventsHandlers.GetNamespaceChangesListHandler)
+
+		changes.GET("/deployments/:deployment", eventsHandlers.GetDeploymentChangesListHandler)
+		changes.GET("/deployments", eventsHandlers.GetNamespaceDeploymentsChangesListHandler)
+
+		changes.GET("/services/:service", eventsHandlers.GetServiceChangesListHandler)
+		changes.GET("/services", eventsHandlers.GetNamespaceServicesChangesListHandler)
+
+		changes.GET("/ingresses/:ingress", eventsHandlers.GetIngressChangesListHandler)
+		changes.GET("/ingresses", eventsHandlers.GetNamespaceIngressesChangesListHandler)
+
+		changes.GET("/pvc/:pvc", eventsHandlers.GetPVCChangesListHandler)
+		changes.GET("/pvc", eventsHandlers.GetNamespacePVCsChangesListHandler)
+	}
+
 }
