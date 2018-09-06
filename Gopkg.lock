@@ -38,15 +38,15 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:7cb4e03dea7c9d41c97eca2d3c6ef086565a16f04694facc3f080005c41594e9"
+  digest = "1:724f76f0379f2a618650c727ae1513260695d33ec8a40262bd6f219b75c94304"
   name = "github.com/containerum/kube-client"
   packages = [
     ".",
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "ea498c77baa0daf3a55d90d4160252c50c5cc687"
-  version = "v0.23.29"
+  revision = "e973fe1c16ef536c9b4a1ce107b1f6884f7d5e75"
+  version = "v0.23.30"
 
 [[projects]]
   digest = "1:30b68702657dd0cb860432e0ac74af43606fdbda7ca1a7171c34df8506f218e0"
@@ -205,6 +205,14 @@
   pruneopts = "NUT"
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
   version = "v1.2.0"
+
+[[projects]]
+  digest = "1:4a0c072e44da763409da72d41492373a034baf2e6d849c76d239b4abdfbb6c49"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+  version = "v1.4.0"
 
 [[projects]]
   digest = "1:8e36686e8b139f8fe240c1d5cf3a145bc675c22ff8e707857cdd3ae17b00d728"
@@ -440,6 +448,7 @@
     "github.com/go-playground/locales/en",
     "github.com/go-playground/locales/en_US",
     "github.com/go-playground/universal-translator",
+    "github.com/gorilla/websocket",
     "github.com/json-iterator/go",
     "github.com/satori/go.uuid",
     "github.com/sirupsen/logrus",
