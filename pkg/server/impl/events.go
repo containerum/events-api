@@ -25,7 +25,7 @@ func NewEventsActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 }
 
 func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetPodEventsList(params.ByName("namespace"), params.ByName("pod"), startTime)
+	events, err := ea.mongo.GetChangesList(params.ByName("namespace"), params.ByName("pod"), db.PodEventsCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, startTime time.Time
 }
 
 func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetNamespacePodsEventsList(params.ByName("namespace"), startTime)
+	events, err := ea.mongo.GetChangesInNamespaceList(params.ByName("namespace"), db.PodEventsCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, startTime
 }
 
 func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetPVCEventsList(params.ByName("namespace"), params.ByName("pvc"), startTime)
+	events, err := ea.mongo.GetChangesList(params.ByName("namespace"), params.ByName("pvc"), db.PVCEventsCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, startTime time.Time
 }
 
 func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetNamespacePVCsEventsList(params.ByName("namespace"), startTime)
+	events, err := ea.mongo.GetChangesInNamespaceList(params.ByName("namespace"), db.PVCEventsCollection, startTime)
 	if err != nil {
 		return nil, err
 	}

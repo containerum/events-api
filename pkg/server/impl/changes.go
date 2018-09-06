@@ -3,6 +3,8 @@ package impl
 import (
 	"time"
 
+	"github.com/containerum/events-api/pkg/db"
+
 	"github.com/containerum/kube-client/pkg/model"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +18,7 @@ func (ea *EventsActionsImpl) GetNamespaceChanges(params gin.Params, startTime ti
 }
 
 func (ea *EventsActionsImpl) GetDeploymentChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetDeploymentChangesList(params.ByName("namespace"), params.ByName("deployment"), startTime)
+	changes, err := ea.mongo.GetChangesList(params.ByName("namespace"), params.ByName("deployment"), db.DeploymentCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +26,7 @@ func (ea *EventsActionsImpl) GetDeploymentChanges(params gin.Params, startTime t
 }
 
 func (ea *EventsActionsImpl) GetNamespaceDeploymentsChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetNamespaceDeploymentsChangesList(params.ByName("namespace"), startTime)
+	changes, err := ea.mongo.GetChangesInNamespaceList(params.ByName("namespace"), db.DeploymentCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +34,7 @@ func (ea *EventsActionsImpl) GetNamespaceDeploymentsChanges(params gin.Params, s
 }
 
 func (ea *EventsActionsImpl) GetServiceChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetServiceChangesList(params.ByName("namespace"), params.ByName("service"), startTime)
+	changes, err := ea.mongo.GetChangesList(params.ByName("namespace"), params.ByName("service"), db.ServiceCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +42,7 @@ func (ea *EventsActionsImpl) GetServiceChanges(params gin.Params, startTime time
 }
 
 func (ea *EventsActionsImpl) GetNamespaceServicesChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetNamespaceServicesChangesList(params.ByName("namespace"), startTime)
+	changes, err := ea.mongo.GetChangesInNamespaceList(params.ByName("namespace"), db.ServiceCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +50,7 @@ func (ea *EventsActionsImpl) GetNamespaceServicesChanges(params gin.Params, star
 }
 
 func (ea *EventsActionsImpl) GetIngressChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetIngressChangesList(params.ByName("namespace"), params.ByName("ingress"), startTime)
+	changes, err := ea.mongo.GetChangesList(params.ByName("namespace"), params.ByName("ingress"), db.IngressCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +58,7 @@ func (ea *EventsActionsImpl) GetIngressChanges(params gin.Params, startTime time
 }
 
 func (ea *EventsActionsImpl) GetNamespaceIngressesChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetNamespaceIngressesChangesList(params.ByName("namespace"), startTime)
+	changes, err := ea.mongo.GetChangesInNamespaceList(params.ByName("namespace"), db.IngressCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +66,7 @@ func (ea *EventsActionsImpl) GetNamespaceIngressesChanges(params gin.Params, sta
 }
 
 func (ea *EventsActionsImpl) GetPVCChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetPVCChangesList(params.ByName("namespace"), params.ByName("pvc"), startTime)
+	changes, err := ea.mongo.GetChangesList(params.ByName("namespace"), params.ByName("pvc"), db.PVCCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +74,7 @@ func (ea *EventsActionsImpl) GetPVCChanges(params gin.Params, startTime time.Tim
 }
 
 func (ea *EventsActionsImpl) GetNamespacePVCsChanges(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	changes, err := ea.mongo.GetNamespacePVCsChangesList(params.ByName("namespace"), startTime)
+	changes, err := ea.mongo.GetChangesInNamespaceList(params.ByName("namespace"), db.PVCCollection, startTime)
 	if err != nil {
 		return nil, err
 	}
