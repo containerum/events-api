@@ -1,0 +1,33 @@
+tags:
+  db: true
+  platformdb: false
+
+replicaCount: 1
+
+image:
+  repository: containerum/events-api
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+  secret:
+
+service:
+  port: 1667
+  targetPort: 1667
+  externalIP:
+
+env:
+  global:
+    CH_EVENTS_API_MONGO_LOGIN: "events_user"
+    CH_EVENTS_API_MONGO_DB: "events"
+  local:
+    CH_EVENTS_API_MONGO_ADDR: "mongo-mongodb.mongo.svc.cluster.local:27017"
+    CH_EVENTS_API_MONGO_PASSWORD:
+
+mongodb:
+  persistence:
+    enabled: false
+  image:
+    pullPolicy: IfNotPresent
+  mongodbUsername: events_user
+  mongodbDatabase: events
+  # mongodbPassword: password
