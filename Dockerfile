@@ -8,7 +8,7 @@ FROM alpine:3.7
 
 COPY --from=builder /tmp/events-api /
 ENV CH_EVENTS_API_MONGO_ADDR="mongo-mongodb.mongo.svc.cluster.local:27017" \
-    CH_EVENTS_API_MONGO_DB="events" \
+    CH_EVENTS_API_MONGO_DB="events"
 
 EXPOSE 1667
 
