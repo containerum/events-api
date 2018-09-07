@@ -33,11 +33,11 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
 
-            {{- if .Values.env.local. CH_EVENTS_API_MONGO_ADDR }}
-            - name:  CH_EVENTS_API_MONGO_ADDR
-              value: "{{ .Values.env.local. CH_EVENTS_API_MONGO_ADDR }}"
+            {{- if .Values.env.local.CH_EVENTS_API_MONGO_ADDR }}
+            - name: CH_EVENTS_API_MONGO_ADDR
+              value: "{{ .Values.env.local.CH_EVENTS_API_MONGO_ADDR }}"
             {{- else }}
-            - name:  CH_EVENTS_API_MONGO_ADDR
+            - name: CH_EVENTS_API_MONGO_ADDR
               value: "{{ .Release.Name }}-mongodb:27017"
             {{- end }}
 
