@@ -4,6 +4,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/containerum/events-api/pkg/eaerrors"
+
+	"github.com/containerum/cherry/adaptors/gonic"
+	"github.com/containerum/kube-client/pkg/model"
+	"github.com/gin-gonic/gin/binding"
+
 	m "github.com/containerum/events-api/pkg/router/middleware"
 	"github.com/containerum/events-api/pkg/server"
 	"github.com/gin-gonic/gin"
@@ -76,4 +82,34 @@ func (h *EventsHandlers) GetNamespacePVCsEventsListHandler(ctx *gin.Context) {
 		}
 		ctx.JSON(http.StatusOK, resp)
 	}
+}
+
+func (h *EventsHandlers) AddUserEventHandler(ctx *gin.Context) {
+	var event model.Event
+	if err := ctx.ShouldBindWith(&event, binding.JSON); err != nil {
+		ctx.Error(err)
+		gonic.Gonic(eaerrors.ErrValidation(), ctx)
+		return
+	}
+	if err := h.AddUserEvent(event); err != nil {
+		ctx.Error(err)
+		gonic.Gonic(eaerrors.ErrUnableAddEvent(), ctx)
+		return
+	}
+	ctx.Status(http.StatusAccepted)
+}
+
+func (h *EventsHandlers) AddSystemEventHandler(ctx *gin.Context) {
+	var event model.Event
+	if err := ctx.ShouldBindWith(&event, binding.JSON); err != nil {
+		ctx.Error(err)
+		gonic.Gonic(eaerrors.ErrValidation(), ctx)
+		return
+	}
+	if err := h.AddSystemEvent(event); err != nil {
+		ctx.Error(err)
+		gonic.Gonic(eaerrors.ErrUnableAddEvent(), ctx)
+		return
+	}
+	ctx.Status(http.StatusAccepted)
 }
