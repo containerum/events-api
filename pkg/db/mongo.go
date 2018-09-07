@@ -14,12 +14,11 @@ const (
 	localURL = "localhost:27017"
 
 	ResourceQuotasCollection = "namespaces"
-	PodEventsCollection      = "podevents"
+	EventsCollection         = "events"
 	DeploymentCollection     = "deployments"
 	ServiceCollection        = "services"
 	IngressCollection        = "ingresses"
 	PVCCollection            = "volumes"
-	PVCEventsCollection      = "pvcevents"
 )
 
 type MongoStorage struct {
