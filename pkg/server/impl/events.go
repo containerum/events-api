@@ -75,3 +75,19 @@ func (ea *EventsActionsImpl) AddSystemEvent(event model.Event) error {
 	}
 	return ea.mongo.AddContainerumEvent(mongodb.SystemCollection, event)
 }
+
+func (ea *EventsActionsImpl) GetUsersEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetUsersEventsList(startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
+func (ea *EventsActionsImpl) GetSystemEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetSystemEventsList(startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}

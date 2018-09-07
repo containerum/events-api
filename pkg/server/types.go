@@ -28,6 +28,9 @@ type EventsActions interface {
 	GetPVCEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePVCsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
 
+	GetUsersEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
+	GetSystemEvents(params gin.Params, startTime time.Time) (*model.EventsList, error)
+
 	AddUserEvent(event model.Event) error
 	AddSystemEvent(event model.Event) error
 }

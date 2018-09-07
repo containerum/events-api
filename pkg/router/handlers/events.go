@@ -113,3 +113,35 @@ func (h *EventsHandlers) AddSystemEventHandler(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusAccepted)
 }
+
+func (h *EventsHandlers) GetUsersEventsListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		if err := withWS(ctx, h.GetUsersEvents); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+	} else {
+		resp, err := h.GetUsersEvents(ctx.Params, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+		ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *EventsHandlers) GetSystemEventsListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		if err := withWS(ctx, h.GetSystemEvents); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+	} else {
+		resp, err := h.GetSystemEvents(ctx.Params, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+		ctx.JSON(http.StatusOK, resp)
+	}
+}
