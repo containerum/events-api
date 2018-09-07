@@ -12,13 +12,6 @@ import (
 
 const (
 	localURL = "localhost:27017"
-
-	ResourceQuotasCollection = "namespaces"
-	EventsCollection         = "events"
-	DeploymentCollection     = "deployments"
-	ServiceCollection        = "services"
-	IngressCollection        = "ingresses"
-	PVCCollection            = "volumes"
 )
 
 type MongoStorage struct {

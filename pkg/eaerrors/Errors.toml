@@ -36,3 +36,9 @@ SID = "events-api"
     StatusHTTP = 403
     Message = "Access denied"
     Kind = 6
+
+[[error]]
+    Name = "ErrUnableAddEvent"
+    StatusHTTP = 500
+    Message = "Unable to add event"
+    Kind = 7

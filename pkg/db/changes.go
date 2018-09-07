@@ -25,7 +25,7 @@ func (mongo *MongoStorage) GetChangesList(namespace, resource, collectionName st
 }
 
 func (mongo *MongoStorage) GetChangesInNamespaceList(namespace, collectionName string, startTime time.Time) ([]model.Event, error) {
-	mongo.logger.Debugf("getting changes in namespace")
+	mongo.logger.WithField("collection", collectionName).Debugf("getting changes in namespace")
 	var collection = mongo.db.C(collectionName)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
