@@ -14,7 +14,7 @@ func (mongo *MongoStorage) GetSystemEventsList(startTime time.Time) ([]model.Eve
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
 		"dateadded": bson.M{
-			"$gte": startTime.Format(time.RFC3339),
+			"$gte": startTime,
 		},
 	}).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get system changes")

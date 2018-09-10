@@ -16,7 +16,7 @@ func (mongo *MongoStorage) GetNamespaceChangesList(namespace string, startTime t
 	if err := collection.Find(bson.M{
 		"resourcename": namespace,
 		"dateadded": bson.M{
-			"$gte": startTime.Format(time.RFC3339),
+			"$gte": startTime,
 		},
 	}).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get namespace changes")
