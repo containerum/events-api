@@ -17,7 +17,7 @@ func (mongo *MongoStorage) GetEventsList(namespace, resource string, resourcetyp
 		"resourcename":      resource,
 		"resourcetype":      resourcetype,
 		"dateadded": bson.M{
-			"$gte": startTime.Format(time.RFC3339),
+			"$gte": startTime,
 		},
 	}).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get changes")
@@ -34,7 +34,7 @@ func (mongo *MongoStorage) GetEventsInNamespaceList(namespace string, resourcety
 		"resourcenamespace": namespace,
 		"resourcetype":      resourcetype,
 		"dateadded": bson.M{
-			"$gte": startTime.Format(time.RFC3339),
+			"$gte": startTime,
 		},
 	}).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get events in namespace")
