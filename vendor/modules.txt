@@ -8,7 +8,7 @@ github.com/blang/semver
 github.com/containerum/cherry
 github.com/containerum/cherry/adaptors/cherrylog
 github.com/containerum/cherry/adaptors/gonic
-# github.com/containerum/kube-client v0.23.30
+# github.com/containerum/kube-client v0.23.31
 github.com/containerum/kube-client/pkg/model
 # github.com/containerum/kube-events v1.0.1-rc.6
 github.com/containerum/kube-events/pkg/storage/mongodb

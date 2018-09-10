@@ -2,7 +2,7 @@ module github.com/containerum/events-api
 
 require (
 	github.com/containerum/cherry v1.0.2
-	github.com/containerum/kube-client v0.23.30
+	github.com/containerum/kube-client v0.23.31
 	github.com/containerum/kube-events v1.0.1-rc.6
 	github.com/containerum/utils v1.0.7
 	github.com/gin-contrib/cors v0.0.0-20170318125340-cf4846e6a636

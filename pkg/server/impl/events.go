@@ -59,7 +59,7 @@ func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, startTime
 }
 
 func (ea *EventsActionsImpl) AddUserEvent(event model.Event) error {
-	event.DateAdded = time.Now().Format(time.RFC3339)
+	event.DateAdded = time.Now()
 	event.ResourceType = model.TypeUser
 	if event.Kind == "" {
 		event.Kind = model.EventInfo
@@ -68,7 +68,7 @@ func (ea *EventsActionsImpl) AddUserEvent(event model.Event) error {
 }
 
 func (ea *EventsActionsImpl) AddSystemEvent(event model.Event) error {
-	event.DateAdded = time.Now().Format(time.RFC3339)
+	event.DateAdded = time.Now()
 	event.ResourceType = model.TypeSystem
 	if event.Kind == "" {
 		event.Kind = model.EventInfo

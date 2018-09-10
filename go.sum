@@ -8,6 +8,8 @@ github.com/containerum/cherry v1.0.2 h1:yeXQj3utIYE9ebRVVTh+pUAtuh5TYyrpfmysIm6E
 github.com/containerum/cherry v1.0.2/go.mod h1:WpnNBYTtTTPaxTVSo/Hp0PG1k15R34uCuavn+8QkWL0=
 github.com/containerum/kube-client v0.23.30 h1:Ht3cCU4Myo7vSCGj0sdjBEiNssbyiCHPfhPQdbOrVik=
 github.com/containerum/kube-client v0.23.30/go.mod h1:61P8/wJ8DxbKRdll4AyWfBv3FWqsq7Fn5ny1YLY72OU=
+github.com/containerum/kube-client v0.23.31 h1:w46FpLTBjFnYiFg6Sdq+UoSd+O1CrwxcfZukrrULV5I=
+github.com/containerum/kube-client v0.23.31/go.mod h1:61P8/wJ8DxbKRdll4AyWfBv3FWqsq7Fn5ny1YLY72OU=
 github.com/containerum/kube-events v1.0.0 h1:0X0l6IKdc4OYgP8jYCnQNp62dc39ewgOemIcA0O9a4k=
 github.com/containerum/kube-events v1.0.0/go.mod h1:SIy61Rk4Z9lLkWPZq12j45M/QbcY1PoY+/NHPfiyScE=
 github.com/containerum/kube-events v1.0.1-rc.6 h1:Hqj9tc9zzkLuyZpD+4+s0p5mKNb7dU4lEY72FY4DLLs=
