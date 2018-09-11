@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +17,11 @@ func (h *EventsHandlers) GetNamespaceChangesListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetNamespaceChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespaceChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -30,7 +37,11 @@ func (h *EventsHandlers) GetDeploymentChangesListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetDeploymentChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetDeploymentChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -46,7 +57,11 @@ func (h *EventsHandlers) GetNamespaceDeploymentsChangesListHandler(ctx *gin.Cont
 			return
 		}
 	} else {
-		resp, err := h.GetNamespaceDeploymentsChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespaceDeploymentsChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -62,7 +77,11 @@ func (h *EventsHandlers) GetServiceChangesListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetServiceChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetServiceChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -78,7 +97,11 @@ func (h *EventsHandlers) GetNamespaceServicesChangesListHandler(ctx *gin.Context
 			return
 		}
 	} else {
-		resp, err := h.GetNamespaceServicesChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespaceServicesChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -94,7 +117,11 @@ func (h *EventsHandlers) GetIngressChangesListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetIngressChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetIngressChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -110,7 +137,11 @@ func (h *EventsHandlers) GetNamespaceIngressesChangesListHandler(ctx *gin.Contex
 			return
 		}
 	} else {
-		resp, err := h.GetNamespaceIngressesChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespaceIngressesChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -126,7 +157,11 @@ func (h *EventsHandlers) GetPVCChangesListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetPVCChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetPVCChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -142,7 +177,11 @@ func (h *EventsHandlers) GetNamespacePVCsChangesListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetNamespacePVCsChanges(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespacePVCsChanges(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return

@@ -70,7 +70,7 @@ func initServer(c *cli.Context) error {
 
 func exitOnError(err error) {
 	if err != nil {
-		logrus.WithError(err).Fatalf("can`t setup resource-service")
+		logrus.WithError(err).Fatalf("can`t setup events-api")
 		os.Exit(1)
 	}
 }

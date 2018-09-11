@@ -26,32 +26,32 @@ func NewEventsActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 	}
 }
 
-func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsList(params.ByName("namespace"), params.ByName("pod"), model.TypePod, startTime)
+func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetEventsList(params.ByName("namespace"), params.ByName("pod"), model.TypePod, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsInNamespaceList(params.ByName("namespace"), model.TypePod, startTime)
+func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetEventsInNamespaceList(params.ByName("namespace"), model.TypePod, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsList(params.ByName("namespace"), params.ByName("pvc"), model.TypeVolume, startTime)
+func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetEventsList(params.ByName("namespace"), params.ByName("pvc"), model.TypeVolume, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsInNamespaceList(params.ByName("namespace"), model.TypeVolume, startTime)
+func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetEventsInNamespaceList(params.ByName("namespace"), model.TypeVolume, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -76,16 +76,16 @@ func (ea *EventsActionsImpl) AddSystemEvent(event model.Event) error {
 	return ea.mongo.AddContainerumEvent(mongodb.SystemCollection, event)
 }
 
-func (ea *EventsActionsImpl) GetUsersEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetUsersEventsList(startTime)
+func (ea *EventsActionsImpl) GetUsersEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetUsersEventsList(limit, startTime)
 	if err != nil {
 		return nil, err
 	}
 	return &model.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetSystemEvents(params gin.Params, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetSystemEventsList(startTime)
+func (ea *EventsActionsImpl) GetSystemEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	events, err := ea.mongo.GetSystemEventsList(limit, startTime)
 	if err != nil {
 		return nil, err
 	}

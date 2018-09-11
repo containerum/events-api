@@ -8,7 +8,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-func (mongo *MongoStorage) GetEventsList(namespace, resource string, resourcetype model.ResourceType, startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetEventsList(namespace, resource string, resourcetype model.ResourceType, limit int, startTime time.Time) ([]model.Event, error) {
 	mongo.logger.WithField("collection", mongodb.EventsCollection).Debugf("getting events")
 	var collection = mongo.db.C(mongodb.EventsCollection)
 	result := make([]model.Event, 0)
@@ -19,14 +19,14 @@ func (mongo *MongoStorage) GetEventsList(namespace, resource string, resourcetyp
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},
-	}).All(&result); err != nil {
+	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get changes")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
 	return result, nil
 }
 
-func (mongo *MongoStorage) GetEventsInNamespaceList(namespace string, resourcetype model.ResourceType, startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetEventsInNamespaceList(namespace string, resourcetype model.ResourceType, limit int, startTime time.Time) ([]model.Event, error) {
 	mongo.logger.WithField("collection", mongodb.EventsCollection).Debugf("getting events in namespace")
 	var collection = mongo.db.C(mongodb.EventsCollection)
 	result := make([]model.Event, 0)
@@ -36,7 +36,7 @@ func (mongo *MongoStorage) GetEventsInNamespaceList(namespace string, resourcety
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},
-	}).All(&result); err != nil {
+	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get events in namespace")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
