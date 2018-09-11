@@ -1,6 +1,6 @@
-// Package router Resource-Service
+// Package router Events-API
 //
-// Resource-Service is service for storing kubernetes resources in Mongo DB.
+// Events-API is service for storing Kubernetes and Containerum events in Mongo DB.
 //
 //  Version: 0.0.1
 //	Consumes:

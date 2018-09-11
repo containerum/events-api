@@ -7,8 +7,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Resource-Service is service for storing kubernetes resources in Mongo DB.",
-    "title": "Resource-Service",
+    "description": "Events-API is service for storing Kubernetes and Containerum events in Mongo DB.",
+    "title": "Events-API",
     "version": "0.0.1"
   },
   "paths": {},
@@ -1460,7 +1460,9 @@
       ],
       "properties": {
         "access": {
+          "description": "one of: \"owner\", \"read\", \"write\", \"read-delete\", \"none\"",
           "type": "string",
+          "x-go-name": "Access",
           "$ref": "#/definitions/AccessLevel"
         },
         "id": {
@@ -1474,7 +1476,7 @@
           "x-go-name": "Label"
         }
       },
-      "x-go-package": "github.com/containerum/events-api/pkg/models/headers"
+      "x-go-package": "github.com/containerum/events-api/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "Version": {
       "description": "Version represents a semver compatible version",

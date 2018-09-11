@@ -1,8 +1,5 @@
 /.idea
-/resource-manager
-/resource-service
-/resource
-!/resource/
+/events-api
 *.tgz
 */*.sh
 *.sh
