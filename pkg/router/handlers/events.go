@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/containerum/events-api/pkg/eaerrors"
 
@@ -27,7 +30,11 @@ func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetPodEvents(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetPodEvents(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -43,7 +50,11 @@ func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetNamespacePodsEvents(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespacePodsEvents(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -59,7 +70,11 @@ func (h *EventsHandlers) GetPVCEventsListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetPVCEvents(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetPVCEvents(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -75,7 +90,11 @@ func (h *EventsHandlers) GetNamespacePVCsEventsListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetNamespacePVCsEvents(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespacePVCsEvents(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -121,7 +140,11 @@ func (h *EventsHandlers) GetUsersEventsListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetUsersEvents(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetUsersEvents(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -137,7 +160,11 @@ func (h *EventsHandlers) GetSystemEventsListHandler(ctx *gin.Context) {
 			return
 		}
 	} else {
-		resp, err := h.GetSystemEvents(ctx.Params, time.Time{})
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetSystemEvents(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return

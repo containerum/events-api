@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -12,16 +13,22 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-type eventsFunc func(gin.Params, time.Time) (*model.EventsList, error)
+type eventsFunc func(gin.Params, int, time.Time) (*model.EventsList, error)
 
 func withWS(ctx *gin.Context, getfunc eventsFunc) error {
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		return err
 	}
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+
 	var startTime time.Time
 	for {
-		resp, err := getfunc(ctx.Params, startTime)
+		resp, err := getfunc(ctx.Params, limit, startTime)
+		limit = 0
 		startTime = time.Now()
 		if err != nil {
 			return err

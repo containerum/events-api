@@ -74,7 +74,6 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 		containerumEvents.POST("/system", eventsHandlers.AddSystemEventHandler)
 		containerumEvents.GET("/system", eventsHandlers.GetSystemEventsListHandler)
 	}
-
 	events := router.Group("/events/namespaces/:namespace")
 	{
 		events.GET("/pods/:pod", eventsHandlers.GetPodEventsListHandler)
@@ -99,5 +98,4 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 		changes.GET("/pvc/:pvc", eventsHandlers.GetPVCChangesListHandler)
 		changes.GET("/pvc", eventsHandlers.GetNamespacePVCsChangesListHandler)
 	}
-
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-func (mongo *MongoStorage) GetSystemEventsList(startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetSystemEventsList(limit int, startTime time.Time) ([]model.Event, error) {
 	mongo.logger.Debugf("getting system changes")
 	var collection = mongo.db.C(mongodb.SystemCollection)
 	result := make([]model.Event, 0)
@@ -16,7 +16,7 @@ func (mongo *MongoStorage) GetSystemEventsList(startTime time.Time) ([]model.Eve
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},
-	}).All(&result); err != nil {
+	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get system changes")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
