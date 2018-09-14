@@ -10,7 +10,7 @@ github.com/containerum/cherry/adaptors/cherrylog
 github.com/containerum/cherry/adaptors/gonic
 # github.com/containerum/kube-client v0.23.31
 github.com/containerum/kube-client/pkg/model
-# github.com/containerum/kube-events v1.0.1-rc.6
+# github.com/containerum/kube-events v1.0.1-rc.10
 github.com/containerum/kube-events/pkg/storage/mongodb
 # github.com/containerum/utils v1.0.7
 github.com/containerum/utils/httputil

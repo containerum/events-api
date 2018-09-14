@@ -22,6 +22,12 @@ type EventsActions interface {
 	GetPVCChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePVCsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
+	GetSecretChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetNamespaceSecretsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+
+	GetConfigMapChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetNamespaceConfigMapsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+
 	GetPodEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 

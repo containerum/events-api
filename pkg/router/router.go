@@ -97,5 +97,11 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 
 		changes.GET("/pvc/:pvc", eventsHandlers.GetPVCChangesListHandler)
 		changes.GET("/pvc", eventsHandlers.GetNamespacePVCsChangesListHandler)
+
+		changes.GET("/secrets/:secret", eventsHandlers.GetSecretChangesListHandler)
+		changes.GET("/secrets", eventsHandlers.GetNamespaceSecretsChangesListHandler)
+
+		changes.GET("/configmaps/:configmap", eventsHandlers.GetConfigMapChangesListHandler)
+		changes.GET("/configmaps", eventsHandlers.GetNamespaceConfigMapsChangesListHandler)
 	}
 }
