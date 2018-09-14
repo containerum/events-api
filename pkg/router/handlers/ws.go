@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,16 +10,11 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-func withWS(ctx *gin.Context, getfunc eventsFunc) error {
+func withWS(ctx *gin.Context, getfunc eventsFunc, limit int) error {
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		return err
 	}
-	limit, err := strconv.Atoi(ctx.Query("limit"))
-	if err != nil {
-		logrus.Warn(err)
-	}
-
 	var startTime time.Time
 	for {
 		resp, err := getfunc(ctx.Params, limit, startTime)

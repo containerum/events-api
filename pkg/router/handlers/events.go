@@ -14,7 +14,6 @@ import (
 
 func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
 	handleResourceChangesEvents(h, ctx, h.GetPodEvents)
-
 }
 
 func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
