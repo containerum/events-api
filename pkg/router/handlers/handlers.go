@@ -20,16 +20,16 @@ type EventsHandlers struct {
 type eventsFunc func(gin.Params, int, time.Time) (*model.EventsList, error)
 
 func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc eventsFunc) {
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
 	if _, ws := ctx.GetQuery("ws"); ws {
-		if err := withWS(ctx, getFunc); err != nil {
+		if err := withWS(ctx, getFunc, limit); err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
 		}
 	} else {
-		limit, err := strconv.Atoi(ctx.Query("limit"))
-		if err != nil {
-			logrus.Warn(err)
-		}
 		resp, err := getFunc(ctx.Params, limit, time.Time{})
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
