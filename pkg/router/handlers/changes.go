@@ -189,3 +189,83 @@ func (h *EventsHandlers) GetNamespacePVCsChangesListHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 	}
 }
+
+func (h *EventsHandlers) GetSecretChangesListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		if err := withWS(ctx, h.GetSecretChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+	} else {
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetSecretChanges(ctx.Params, limit, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+		ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *EventsHandlers) GetNamespaceSecretsChangesListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		if err := withWS(ctx, h.GetNamespaceSecretsChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+	} else {
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespaceSecretsChanges(ctx.Params, limit, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+		ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *EventsHandlers) GetConfigMapChangesListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		if err := withWS(ctx, h.GetConfigMapChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+	} else {
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetConfigMapChanges(ctx.Params, limit, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+		ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *EventsHandlers) GetNamespaceConfigMapsChangesListHandler(ctx *gin.Context) {
+	if _, ws := ctx.GetQuery("ws"); ws {
+		if err := withWS(ctx, h.GetNamespaceConfigMapsChanges); err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+	} else {
+		limit, err := strconv.Atoi(ctx.Query("limit"))
+		if err != nil {
+			logrus.Warn(err)
+		}
+		resp, err := h.GetNamespaceConfigMapsChanges(ctx.Params, limit, time.Time{})
+		if err != nil {
+			ctx.AbortWithStatusJSON(h.HandleError(err))
+			return
+		}
+		ctx.JSON(http.StatusOK, resp)
+	}
+}

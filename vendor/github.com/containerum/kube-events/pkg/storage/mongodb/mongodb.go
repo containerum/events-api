@@ -1,11 +1,8 @@
 package mongodb
 
 import (
-	"time"
-
 	kubeClientModel "github.com/containerum/kube-client/pkg/model"
 	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,17 +13,21 @@ const (
 	ServiceCollection        = "services"
 	IngressCollection        = "ingresses"
 	PVCCollection            = "volumes"
+	SecretsCollection        = "secrets"
+	ConfigMapsCollection     = "configmaps"
 	UserCollection           = "user"
 	SystemCollection         = "system"
 )
 
-var collections = []string{
+var Сollections = []string{
 	ResourceQuotasCollection,
+	EventsCollection,
 	DeploymentCollection,
 	ServiceCollection,
 	IngressCollection,
 	PVCCollection,
-	EventsCollection,
+	SecretsCollection,
+	ConfigMapsCollection,
 	UserCollection,
 	SystemCollection,
 }
@@ -64,28 +65,34 @@ func OpenConnection(cfg *Config) (*Storage, error) {
 	}
 
 	if cfg.CollectionSize > 0 {
-		if err := storage.createCappedCollectionIfNotExist(EventsCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(EventsCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(DeploymentCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(DeploymentCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(ResourceQuotasCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(ResourceQuotasCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(ServiceCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(ServiceCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(IngressCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(IngressCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(PVCCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(PVCCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(UserCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(SecretsCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
-		if err := storage.createCappedCollectionIfNotExist(SystemCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+		if err := storage.createCollectionIfNotExist(ConfigMapsCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+			return nil, err
+		}
+		if err := storage.createCollectionIfNotExist(UserCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
+			return nil, err
+		}
+		if err := storage.createCollectionIfNotExist(SystemCollection, cfg.CollectionSize, cfg.MaxDocuments); err != nil {
 			return nil, err
 		}
 	}
@@ -119,25 +126,6 @@ func (s *Storage) BulkInsert(r []kubeClientModel.Event, collection string) error
 		"matched":  result.Matched,
 		"modified": result.Modified,
 	}).Debug("Bulk insert run")
-	return nil
-}
-
-func (s *Storage) Cleanup(deleteBefore time.Time) error {
-	s.log.WithField("delete_before", deleteBefore).Debugf("Cleanup")
-	for _, col := range collections {
-		bulk := s.db.C(col).Bulk()
-		bulk.Unordered()
-		bulk.RemoveAll(bson.M{"timestamp": bson.M{"$lte": deleteBefore}})
-		result, err := bulk.Run()
-		if err != nil {
-			return err
-		}
-		s.log.WithFields(logrus.Fields{
-			"matched":    result.Matched,
-			"modified":   result.Modified,
-			"collection": col,
-		}).Debug("Cleanup run")
-	}
 	return nil
 }
 
