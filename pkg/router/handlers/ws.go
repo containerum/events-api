@@ -4,15 +4,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/containerum/kube-client/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
 var upgrader = websocket.Upgrader{}
-
-type eventsFunc func(gin.Params, int, time.Time) (*model.EventsList, error)
 
 func withWS(ctx *gin.Context, getfunc eventsFunc) error {
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
