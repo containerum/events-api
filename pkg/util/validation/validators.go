@@ -21,10 +21,6 @@ func StandardResourceValidator(uni *ut.UniversalTranslator) (ret *validator.Vali
 	enTranslations.RegisterDefaultTranslations(ret, enTranslator)
 	enTranslations.RegisterDefaultTranslations(ret, enUSTranslator)
 
-	registerCustomTags(ret)
-	registerCustomTagsENTranslation(ret, enTranslator)
-	registerCustomTagsENTranslation(ret, enUSTranslator)
-
 	ret.RegisterStructValidation(ingressValidate, kubtypes.Ingress{})
 	ret.RegisterStructValidation(serviceValidate, kubtypes.Service{})
 	ret.RegisterStructValidation(deploymentValidate, kubtypes.Deployment{})
