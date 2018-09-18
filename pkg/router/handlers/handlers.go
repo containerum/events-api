@@ -35,3 +35,18 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 		ctx.JSON(http.StatusOK, resp)
 	}
 }
+
+func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit,
+		h.GetNamespaceChanges,
+		h.GetNamespaceDeploymentsChanges,
+		h.GetNamespaceServicesChanges,
+		h.GetNamespaceIngressesChanges,
+		h.GetNamespaceConfigMapsChanges,
+		h.GetNamespaceSecretsChanges,
+		h.GetNamespacePVCsChanges)
+}

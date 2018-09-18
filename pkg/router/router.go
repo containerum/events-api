@@ -86,6 +86,8 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 	{
 		changes.GET("", eventsHandlers.GetNamespaceChangesListHandler)
 
+		changes.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)
+
 		changes.GET("/deployments/:deployment", eventsHandlers.GetDeploymentChangesListHandler)
 		changes.GET("/deployments", eventsHandlers.GetNamespaceDeploymentsChangesListHandler)
 
