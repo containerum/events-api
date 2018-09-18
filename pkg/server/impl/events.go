@@ -27,7 +27,10 @@ func NewEventsActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 }
 
 func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsList(params.ByName("namespace"), params.ByName("pod"), model.TypePod, limit, startTime)
+	ns := params.ByName("namespace")
+	pod := params.ByName("pod")
+	ea.log.WithField("namespace", ns).WithField("pod", pod).Debugln("Getting pod events")
+	events, err := ea.mongo.GetEventsList(ns, pod, model.TypePod, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +38,9 @@ func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, limit int, startTim
 }
 
 func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsInNamespaceList(params.ByName("namespace"), model.TypePod, limit, startTime)
+	ns := params.ByName("namespace")
+	ea.log.WithField("namespace", ns).Debugln("Getting pods events")
+	events, err := ea.mongo.GetEventsInNamespaceList(ns, model.TypePod, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +48,10 @@ func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, limit int
 }
 
 func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsList(params.ByName("namespace"), params.ByName("pvc"), model.TypeVolume, limit, startTime)
+	ns := params.ByName("namespace")
+	pvc := params.ByName("pvc")
+	ea.log.WithField("namespace", ns).Debugln("Getting PVC events")
+	events, err := ea.mongo.GetEventsList(ns, pvc, model.TypeVolume, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +59,27 @@ func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, limit int, startTim
 }
 
 func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetEventsInNamespaceList(params.ByName("namespace"), model.TypeVolume, limit, startTime)
+	ns := params.ByName("namespace")
+	ea.log.WithField("namespace", ns).Debugln("Getting PVCs events")
+	events, err := ea.mongo.GetEventsInNamespaceList(ns, model.TypeVolume, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
+func (ea *EventsActionsImpl) GetUsersEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting users events")
+	events, err := ea.mongo.GetUsersEventsList(limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
+func (ea *EventsActionsImpl) GetSystemEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting system events")
+	events, err := ea.mongo.GetSystemEventsList(limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +87,7 @@ func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, limit int
 }
 
 func (ea *EventsActionsImpl) AddUserEvent(event model.Event) error {
+	ea.log.Debugln("Adding user event")
 	event.DateAdded = time.Now()
 	event.ResourceType = model.TypeUser
 	if event.Kind == "" {
@@ -68,26 +97,11 @@ func (ea *EventsActionsImpl) AddUserEvent(event model.Event) error {
 }
 
 func (ea *EventsActionsImpl) AddSystemEvent(event model.Event) error {
+	ea.log.Debugln("Adding system event")
 	event.DateAdded = time.Now()
 	event.ResourceType = model.TypeSystem
 	if event.Kind == "" {
 		event.Kind = model.EventInfo
 	}
 	return ea.mongo.AddContainerumEvent(mongodb.SystemCollection, event)
-}
-
-func (ea *EventsActionsImpl) GetUsersEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetUsersEventsList(limit, startTime)
-	if err != nil {
-		return nil, err
-	}
-	return &model.EventsList{Events: events}, nil
-}
-
-func (ea *EventsActionsImpl) GetSystemEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	events, err := ea.mongo.GetSystemEventsList(limit, startTime)
-	if err != nil {
-		return nil, err
-	}
-	return &model.EventsList{Events: events}, nil
 }
