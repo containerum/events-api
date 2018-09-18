@@ -1,12 +1,14 @@
 # github.com/blang/semver v3.5.1+incompatible
 github.com/blang/semver
+# github.com/common-nighthawk/go-figure v0.0.0-20180619031829-18b2b544842c
+github.com/common-nighthawk/go-figure
 # github.com/containerum/cherry v1.0.2
 github.com/containerum/cherry
 github.com/containerum/cherry/adaptors/cherrylog
 github.com/containerum/cherry/adaptors/gonic
 # github.com/containerum/kube-client v0.23.31
 github.com/containerum/kube-client/pkg/model
-# github.com/containerum/kube-events v1.0.1-rc.10
+# github.com/containerum/kube-events v1.0.1-rc.12
 github.com/containerum/kube-events/pkg/storage/mongodb
 # github.com/containerum/utils v1.0.7
 github.com/containerum/utils/httputil

@@ -4,6 +4,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/blang/semver v3.5.1+incompatible h1:cQNTCjp13qL8KC3Nbxr/y2Bqb63oX6wdnnjpJbkM4JQ=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
+github.com/common-nighthawk/go-figure v0.0.0-20180619031829-18b2b544842c h1:KJ5BNDIKwk6Ayx61ONcQiB9P8leud+Lze6IRayV23XY=
+github.com/common-nighthawk/go-figure v0.0.0-20180619031829-18b2b544842c/go.mod h1:mk5IQ+Y0ZeO87b858TlA645sVcEcbiX6YqP98kt+7+w=
 github.com/containerum/cherry v1.0.2 h1:yeXQj3utIYE9ebRVVTh+pUAtuh5TYyrpfmysIm6E0Fk=
 github.com/containerum/cherry v1.0.2/go.mod h1:WpnNBYTtTTPaxTVSo/Hp0PG1k15R34uCuavn+8QkWL0=
 github.com/containerum/kube-client v0.23.30 h1:Ht3cCU4Myo7vSCGj0sdjBEiNssbyiCHPfhPQdbOrVik=
@@ -16,6 +18,8 @@ github.com/containerum/kube-events v1.0.1-rc.6 h1:Hqj9tc9zzkLuyZpD+4+s0p5mKNb7dU
 github.com/containerum/kube-events v1.0.1-rc.6/go.mod h1:k0icKKkHcZUmhdmeSlON3BPw6h5ZymbwVVsKkUqCNmc=
 github.com/containerum/kube-events v1.0.1-rc.10 h1:Q/1J2FhOVCIjIyFxtFg5ziHvTTm1Hq6ao6xaouUC5Gg=
 github.com/containerum/kube-events v1.0.1-rc.10/go.mod h1:mzlYAZhnaio+bkbVC8QR0VhN/14tJ0iusRknyuYZcpI=
+github.com/containerum/kube-events v1.0.1-rc.12 h1:pQ/1vnP8X81fdneKxYE3+80mQrikvAhwHEf4ajTBRUw=
+github.com/containerum/kube-events v1.0.1-rc.12/go.mod h1:mzlYAZhnaio+bkbVC8QR0VhN/14tJ0iusRknyuYZcpI=
 github.com/containerum/utils v1.0.7 h1:l8w+2x/x8dIMjnz5hal51E6ILTsp7E13m8It942V3Zo=
 github.com/containerum/utils v1.0.7/go.mod h1:/xTVe0g2o6+ldWKoP9uyUvpGzh20R/cyvNCU00T6zYY=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

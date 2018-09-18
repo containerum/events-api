@@ -1,9 +1,10 @@
 module github.com/containerum/events-api
 
 require (
+	github.com/common-nighthawk/go-figure v0.0.0-20180619031829-18b2b544842c
 	github.com/containerum/cherry v1.0.2
 	github.com/containerum/kube-client v0.23.31
-	github.com/containerum/kube-events v1.0.1-rc.10
+	github.com/containerum/kube-events v1.0.1-rc.12
 	github.com/containerum/utils v1.0.7
 	github.com/gin-contrib/cors v0.0.0-20170318125340-cf4846e6a636
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
@@ -24,5 +25,4 @@ require (
 	golang.org/x/net v0.0.0-20180906233101-161cd47e91fd
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gopkg.in/go-playground/validator.v9 v9.17.1
-	k8s.io/api v0.0.0-20180905034935-012f271b5d41 // indirect
 )

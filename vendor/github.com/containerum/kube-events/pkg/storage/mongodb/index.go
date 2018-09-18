@@ -39,23 +39,25 @@ var (
 func (s *Storage) ensureIndexes() error {
 	s.log.Debugf("Ensure indexes")
 	var errs []string
-
-	for _, collectionName := range Сollections {
+	for _, collectionName := range Collections {
 		collection := s.db.C(collectionName)
 		if err := collection.EnsureIndex(dateExpirationIndex); err != nil {
 			errs = append(errs, err.Error())
 		}
-		if err := collection.EnsureIndexKey("eventname"); err != nil {
+		if err := collection.EnsureIndexKey("resourcenamespace"); err != nil {
 			errs = append(errs, err.Error())
 		}
-		if err := collection.EnsureIndexKey("resourcename"); err != nil {
-			errs = append(errs, err.Error())
-		}
-		if err := collection.EnsureIndexKey("eventname", "resourcename"); err != nil {
+		if err := collection.EnsureIndexKey("resourcename", "resourcenamespace"); err != nil {
 			errs = append(errs, err.Error())
 		}
 		switch collectionName {
-		case DeploymentCollection, ResourceQuotasCollection, IngressCollection, ServiceCollection, PVCCollection, SecretsCollection, ConfigMapsCollection:
+		case DeploymentCollection,
+			ResourceQuotasCollection,
+			IngressCollection,
+			ServiceCollection,
+			PVCCollection,
+			SecretsCollection,
+			ConfigMapsCollection:
 			if err := collection.EnsureIndex(uniqueAddedIndex); err != nil {
 				errs = append(errs, err.Error())
 			}
@@ -63,12 +65,16 @@ func (s *Storage) ensureIndexes() error {
 			if err := collection.EnsureIndex(uniqueEventsIndex); err != nil {
 				errs = append(errs, err.Error())
 			}
+			if err := collection.EnsureIndexKey("resourcetype", "resourcename", "resourcenamespace"); err != nil {
+				errs = append(errs, err.Error())
+			}
+			if err := collection.EnsureIndexKey("resourcetype", "resourcenamespace"); err != nil {
+				errs = append(errs, err.Error())
+			}
 		}
 	}
-
 	if len(errs) > 0 {
 		return errors.New(strings.Join(errs, ","))
 	}
-
 	return nil
 }
