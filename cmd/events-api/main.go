@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/common-nighthawk/go-figure"
+
 	"github.com/urfave/cli"
 )
 
@@ -20,7 +22,7 @@ func main() {
 	app.Usage = "Events api for aggregating resources changes and events"
 	app.Flags = flags
 
-	fmt.Printf("Starting %v %v\n", app.Name, app.Version)
+	figure.NewFigure(app.Name, "banner3", true).Print()
 
 	app.Action = initServer
 

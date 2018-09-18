@@ -21,15 +21,17 @@ import (
 )
 
 func initServer(c *cli.Context) error {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	setupLogs(c)
+
+	logrus.Infof("Starting %v %v", c.App.Name, c.App.Version)
+
+	w := tabwriter.NewWriter(logrus.StandardLogger().Writer(), 0, 0, 2, ' ', tabwriter.TabIndent|tabwriter.Debug)
 	for _, f := range c.GlobalFlagNames() {
 		fmt.Fprintf(w, "Flag: %s\t Value: %s\n", f, c.String(f))
 	}
 	if err := w.Flush(); err != nil {
 		logrus.Debug(err)
 	}
-
-	setupLogs(c)
 
 	translate := setupTranslator()
 	validate := validation.StandardResourceValidator(translate)
