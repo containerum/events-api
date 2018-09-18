@@ -25,10 +25,7 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 		logrus.Warn(err)
 	}
 	if _, ws := ctx.GetQuery("ws"); ws {
-		if err := withWS(ctx, getFunc, limit); err != nil {
-			ctx.AbortWithStatusJSON(h.HandleError(err))
-			return
-		}
+		withWS(ctx, limit, getFunc)
 	} else {
 		resp, err := getFunc(ctx.Params, limit, time.Time{})
 		if err != nil {
