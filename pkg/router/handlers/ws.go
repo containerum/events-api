@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/containerum/events-api/pkg/util/ticker"
-	"github.com/containerum/events-api/pkg/util/wg"
 	"github.com/containerum/kube-client/pkg/model"
 
 	"github.com/gin-gonic/gin"
@@ -48,29 +47,32 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	}()
 
 	//Limiter. Waiting for all DB request to finish on first run.
-	var doner = wg.NewWG(len(getfuncs))
+	//	var doner = wg.NewWG(len(getfuncs))
 	for _, eventSource := range getfuncs {
-		go EventAgregator{
-			Ctx:         ctx,
-			Limit:       limit,
-			EventSource: eventSource,
-			EventDrain:  resultChan,
-			ErrChan:     errChan,
-			Doner:       doner,
-		}.Run()
+		go func(es eventsFunc) {
+			EventAgregator{
+				Ctx:         ctx,
+				Limit:       limit,
+				EventSource: es,
+				EventDrain:  resultChan,
+				ErrChan:     errChan,
+			}.Run()
+
+		}(eventSource)
 	}
 
 	go EventBatcher{
 		Ctx:               ctx,
 		ErrChan:           errChan,
-		Quant:             10 * time.Second,
+		Quant:             1 * time.Second,
 		BatchDrain:        finalChan,
-		FirsWaveNotify:    doner.Wait(),
 		PreallocBatchSize: 16,
+		EventSource:       resultChan,
 	}.Run()
 
 	go func() {
-		pingTicker := ticker.NewTicker(2 * time.Second)
+		pingTicker := ticker.NewTicker(1 * time.Second)
+		pingTicker.Start()
 		defer pingTicker.Stop()
 		for {
 			select {
@@ -109,35 +111,25 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 }
 
 type EventBatcher struct {
-	Ctx               *gin.Context
-	ErrChan           chan error
-	Quant             time.Duration
-	EventSource       <-chan model.Event
-	BatchDrain        chan<- []model.Event
-	FirsWaveNotify    <-chan struct{}
+	Ctx         *gin.Context
+	ErrChan     chan error
+	Quant       time.Duration
+	EventSource <-chan model.Event
+	BatchDrain  chan<- []model.Event
+	//	FirsWaveNotify    <-chan struct{}
 	PreallocBatchSize int
 }
 
 func (batcher EventBatcher) Run() {
 	var ctx = batcher.Ctx
-	var doner = batcher.FirsWaveNotify
 	var aborted = AbortWaiter(ctx.IsAborted)
 	var finalChan = batcher.BatchDrain
 	var resultChan = batcher.EventSource
-	defer close(finalChan)
 
-waitFirstEventWave:
-	select {
-	case <-doner:
-		break waitFirstEventWave
-	case <-ctx.Done():
-		return
-	case <-aborted:
-		return
-	}
-
-	results := make([]model.Event, batcher.PreallocBatchSize)
+	results := make([]model.Event, 0)
 	var timer = ticker.NewTicker(batcher.Quant)
+	timer.Start()
+	defer timer.Stop()
 	for {
 		select {
 		case <-aborted:
@@ -146,7 +138,7 @@ waitFirstEventWave:
 			return
 		case <-timer.Ticks():
 			finalChan <- results
-			results = make([]model.Event, batcher.PreallocBatchSize)
+			results = make([]model.Event, 0)
 		case event, ok := <-resultChan:
 			if !ok {
 				return
@@ -163,7 +155,6 @@ type EventAgregator struct {
 	EventSource eventsFunc
 	EventDrain  chan<- model.Event
 	ErrChan     chan<- error
-	Doner       *wg.WG
 }
 
 func (agregate EventAgregator) Run() {
@@ -198,13 +189,11 @@ func (agregate EventAgregator) Run() {
 				case <-agregate.Ctx.Done():
 					return
 				case resultChan <- event:
-
 					continue batchLoop
 				}
 			}
 			if !firstEventSend {
 				firstEventSend = true
-				agregate.Doner.Done()
 			}
 			funcLimit = 0
 			//Get only new events
@@ -223,6 +212,7 @@ func AbortWaiter(aborted func() bool) <-chan struct{} {
 				return
 			}
 			runtime.Gosched()
+			time.Sleep(100 * time.Millisecond)
 		}
 	}()
 	return wait

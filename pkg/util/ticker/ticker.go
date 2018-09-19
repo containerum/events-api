@@ -22,7 +22,7 @@ func NewTicker(step time.Duration) Ticker {
 }
 
 func (ticker Ticker) Start() {
-	ticker.tick()
+	go ticker.tick()
 }
 
 func (ticker Ticker) Stop() {

@@ -16,7 +16,7 @@ func NewWG(n int) *WG {
 	wg.Add(n)
 	var allDone = make(chan struct{})
 	go func() {
-		wg.Done()
+		wg.Wait()
 		close(allDone)
 	}()
 	return &WG{
