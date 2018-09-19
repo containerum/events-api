@@ -48,5 +48,7 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 		h.GetNamespaceIngressesChanges,
 		h.GetNamespaceConfigMapsChanges,
 		h.GetNamespaceSecretsChanges,
-		h.GetNamespacePVCsChanges)
+		h.GetNamespacePVCsChanges,
+		h.GetNamespacePodsEvents,
+		h.GetNamespacePVCsEvents)
 }
