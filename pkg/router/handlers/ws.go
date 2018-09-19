@@ -5,6 +5,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/ninedraft/gocontrol"
+
 	"github.com/containerum/events-api/pkg/util/ticker"
 	"github.com/containerum/kube-client/pkg/model"
 
@@ -16,6 +18,9 @@ import (
 var upgrader = websocket.Upgrader{}
 
 func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
+	var control = &gocontrol.Guard{}
+	defer control.Wait()
+
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		logrus.Debug(err)
@@ -40,6 +45,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 
 	//Checking for closed connection
 	go func() {
+		defer control.Go()()
 		for {
 			_, _, err := c.ReadMessage()
 			if err != nil {
@@ -51,15 +57,14 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
-		go func(es eventsFunc) {
-			EventAgregator{
-				Ctx:         ctx,
-				Limit:       limit,
-				EventSource: es,
-				EventDrain:  resultChan,
-				ErrChan:     errChan,
-			}.Run()
-		}(eventSource)
+		go EventAgregator{
+			Ctx:         ctx,
+			Limit:       limit,
+			EventSource: eventSource,
+			EventDrain:  resultChan,
+			ErrChan:     errChan,
+			Control:     control,
+		}.Run()
 	}
 
 	go EventBatcher{
@@ -69,9 +74,12 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 		BatchDrain:        finalChan,
 		PreallocBatchSize: 16,
 		EventSource:       resultChan,
+		Сontrol:           control,
 	}.Run()
 
 	go func() {
+		defer control.Go()()
+
 		pingTicker := ticker.NewTicker(1 * time.Second)
 		pingTicker.Start()
 		defer pingTicker.Stop()
@@ -100,28 +108,27 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 		}
 	}()
 
-	for {
-		select {
-		case selecerr := <-errChan:
-			if selecerr != nil {
-				logrus.Debug(selecerr)
-				return
-			}
+	for selecerr := range errChan {
+		if selecerr != nil {
+			logrus.Debug(selecerr)
+			return
 		}
 	}
 }
 
 type EventBatcher struct {
-	Ctx         *gin.Context
-	ErrChan     chan error
-	Quant       time.Duration
-	EventSource <-chan model.Event
-	BatchDrain  chan<- []model.Event
-	//	FirsWaveNotify    <-chan struct{}
+	Ctx               *gin.Context
+	ErrChan           chan error
+	Quant             time.Duration
+	EventSource       <-chan model.Event
+	BatchDrain        chan<- []model.Event
+	Сontrol           *gocontrol.Guard
 	PreallocBatchSize int
 }
 
 func (batcher EventBatcher) Run() {
+	defer batcher.Сontrol.Go()()
+
 	var ctx = batcher.Ctx
 	var aborted = AbortWaiter(ctx.IsAborted)
 	var finalChan = batcher.BatchDrain
@@ -156,9 +163,12 @@ type EventAgregator struct {
 	EventSource eventsFunc
 	EventDrain  chan<- model.Event
 	ErrChan     chan<- error
+	Control     *gocontrol.Guard
 }
 
 func (agregate EventAgregator) Run() {
+	defer agregate.Control.Go()()
+
 	var ctx = agregate.Ctx
 	var getfunc = agregate.EventSource
 	var funcLimit = agregate.Limit

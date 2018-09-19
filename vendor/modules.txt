@@ -55,6 +55,8 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/ninedraft/boxofstuff v0.3.7
 github.com/ninedraft/boxofstuff/strset
+# github.com/ninedraft/gocontrol v0.1.0
+github.com/ninedraft/gocontrol
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
 # github.com/sirupsen/logrus v1.0.6

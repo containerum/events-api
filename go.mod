@@ -16,6 +16,7 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/json-iterator/go v1.1.5
 	github.com/mattn/go-isatty v0.0.4 // indirect
+	github.com/ninedraft/gocontrol v0.1.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.0.6
