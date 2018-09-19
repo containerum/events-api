@@ -17,7 +17,7 @@ type EventsHandlers struct {
 	*m.TranslateValidate
 }
 
-type eventsFunc func(gin.Params, int, time.Time) (*model.EventsList, error)
+type eventsFunc func(params gin.Params, limit int, startFrom time.Time) (*model.EventsList, error)
 
 func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc eventsFunc) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
