@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"runtime"
 	"sort"
 	"time"
 
+	"github.com/containerum/events-api/pkg/util/ticker"
+	"github.com/containerum/events-api/pkg/util/wg"
 	"github.com/containerum/kube-client/pkg/model"
 
 	"github.com/gin-gonic/gin"
@@ -45,66 +48,29 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	}()
 
 	//Limiter. Waiting for all DB request to finish on first run.
-	firstRun := len(getfuncs)
-
-	for _, getfunc := range getfuncs {
-		//Get events from the beginning for the first time with default limit
-		var funcLimit = limit
-		var startTime time.Time
-		go func(getfunc eventsFunc) {
-			for {
-				//If context aborted finish goroutine
-				if ctx.IsAborted() {
-					return
-				}
-				resp, err := getfunc(ctx.Params, funcLimit, startTime)
-				if firstRun > 0 {
-					firstRun--
-				}
-				if err != nil {
-					errChan <- err
-					return
-				}
-				//Check again
-				if ctx.IsAborted() {
-					return
-				}
-				for _, event := range resp.Events {
-					resultChan <- event
-				}
-				funcLimit = 0
-				//Get only new events
-				startTime = time.Now()
-				time.Sleep(60 * time.Second)
-			}
-		}(getfunc)
+	var doner = wg.NewWG(len(getfuncs))
+	for _, eventSource := range getfuncs {
+		go EventAgregator{
+			Ctx:         ctx,
+			Limit:       limit,
+			EventSource: eventSource,
+			EventDrain:  resultChan,
+			ErrChan:     errChan,
+			Doner:       doner,
+		}.Run()
 	}
 
-	go func() {
-		results := make([]model.Event, 0)
-		timer := time.NewTicker(100 * time.Millisecond)
-		defer timer.Stop()
-		for {
-			select {
-			case <-timer.C:
-				if firstRun > 0 {
-					continue
-				}
-				timer = time.NewTicker(10 * time.Millisecond)
-				finalChan <- results
-				results = make([]model.Event, 0)
-			case event, ok := <-resultChan:
-				if !ok {
-					close(finalChan)
-					return
-				}
-				results = append(results, event)
-			}
-		}
-	}()
+	go EventBatcher{
+		Ctx:               ctx,
+		ErrChan:           errChan,
+		Quant:             10 * time.Second,
+		BatchDrain:        finalChan,
+		FirsWaveNotify:    doner.Wait(),
+		PreallocBatchSize: 16,
+	}.Run()
 
 	go func() {
-		pingTicker := time.NewTicker(2 * time.Second)
+		pingTicker := ticker.NewTicker(2 * time.Second)
 		defer pingTicker.Stop()
 		for {
 			select {
@@ -123,7 +89,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 						errChan <- err
 					}
 				}
-			case <-pingTicker.C:
+			case <-pingTicker.Ticks():
 				if err := c.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 					return
 				}
@@ -140,4 +106,124 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 			}
 		}
 	}
+}
+
+type EventBatcher struct {
+	Ctx               *gin.Context
+	ErrChan           chan error
+	Quant             time.Duration
+	EventSource       <-chan model.Event
+	BatchDrain        chan<- []model.Event
+	FirsWaveNotify    <-chan struct{}
+	PreallocBatchSize int
+}
+
+func (batcher EventBatcher) Run() {
+	var ctx = batcher.Ctx
+	var doner = batcher.FirsWaveNotify
+	var aborted = AbortWaiter(ctx.IsAborted)
+	var finalChan = batcher.BatchDrain
+	var resultChan = batcher.EventSource
+	defer close(finalChan)
+
+waitFirstEventWave:
+	select {
+	case <-doner:
+		break waitFirstEventWave
+	case <-ctx.Done():
+		return
+	case <-aborted:
+		return
+	}
+
+	results := make([]model.Event, batcher.PreallocBatchSize)
+	var timer = ticker.NewTicker(batcher.Quant)
+	for {
+		select {
+		case <-aborted:
+			return
+		case <-ctx.Done():
+			return
+		case <-timer.Ticks():
+			finalChan <- results
+			results = make([]model.Event, batcher.PreallocBatchSize)
+		case event, ok := <-resultChan:
+			if !ok {
+				return
+			}
+			results = append(results, event)
+		}
+	}
+}
+
+type EventAgregator struct {
+	Ctx         *gin.Context
+	StartAt     time.Time
+	Limit       int
+	EventSource eventsFunc
+	EventDrain  chan<- model.Event
+	ErrChan     chan<- error
+	Doner       *wg.WG
+}
+
+func (agregate EventAgregator) Run() {
+	var ctx = agregate.Ctx
+	var getfunc = agregate.EventSource
+	var funcLimit = agregate.Limit
+	var startTime = agregate.StartAt
+	var resultChan = agregate.EventDrain
+	var errChan = agregate.ErrChan
+	var aborted = AbortWaiter(agregate.Ctx.IsAborted)
+	var firstEventSend = false
+
+	defer close(agregate.EventDrain)
+
+	for {
+		select {
+		case <-aborted: //If context aborted finish goroutine
+			return
+		case <-agregate.Ctx.Done():
+			return
+		default:
+			resp, err := getfunc(ctx.Params, funcLimit, startTime)
+			if err != nil {
+				errChan <- err
+				return
+			}
+		batchLoop:
+			for _, event := range resp.Events {
+				select {
+				case <-aborted: //If context aborted finish goroutine
+					return
+				case <-agregate.Ctx.Done():
+					return
+				case resultChan <- event:
+
+					continue batchLoop
+				}
+			}
+			if !firstEventSend {
+				firstEventSend = true
+				agregate.Doner.Done()
+			}
+			funcLimit = 0
+			//Get only new events
+			startTime = time.Now()
+			time.Sleep(60 * time.Second)
+		}
+	}
+}
+
+func AbortWaiter(aborted func() bool) <-chan struct{} {
+	var wait = make(chan struct{})
+	go func() {
+		defer close(wait)
+		for {
+			if aborted() {
+				return
+			}
+			runtime.Gosched()
+		}
+	}()
+	return wait
 }
