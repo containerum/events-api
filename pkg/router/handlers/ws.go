@@ -28,6 +28,9 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	var errChan = make(chan error)
 	var resultChan = make(chan model.Event)
 	var finalChan = make(chan []model.Event)
+	defer close(resultChan)
+	defer close(errChan)
+	defer close(finalChan)
 
 	c.SetReadDeadline(time.Now().Add(10 * time.Second))
 	c.SetPongHandler(func(string) error {
@@ -47,7 +50,6 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	}()
 
 	//Limiter. Waiting for all DB request to finish on first run.
-	//	var doner = wg.NewWG(len(getfuncs))
 	for _, eventSource := range getfuncs {
 		go func(es eventsFunc) {
 			EventAgregator{
@@ -57,7 +59,6 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 				EventDrain:  resultChan,
 				ErrChan:     errChan,
 			}.Run()
-
 		}(eventSource)
 	}
 
@@ -166,8 +167,6 @@ func (agregate EventAgregator) Run() {
 	var errChan = agregate.ErrChan
 	var aborted = AbortWaiter(agregate.Ctx.IsAborted)
 	var firstEventSend = false
-
-	defer close(agregate.EventDrain)
 
 	for {
 		select {
