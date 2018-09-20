@@ -21,13 +21,15 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
 
+	//Divide limit to all functions
+	limit = limit / len(getfuncs)
+
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		logrus.Debug(err)
 		return
 	}
 	defer c.Close()
-	//Abort context in the end
 	defer ctx.Abort()
 
 	var errChan = make(chan error)

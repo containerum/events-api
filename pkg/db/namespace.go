@@ -9,7 +9,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-func (mongo *MongoStorage) GetNamespaceChangesList(namespace string, startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetNamespaceChangesList(namespace string, limit int, startTime time.Time) ([]model.Event, error) {
 	mongo.logger.Debugf("getting namespace changes")
 	var collection = mongo.db.C(mongodb.ResourceQuotasCollection)
 	result := make([]model.Event, 0)
@@ -18,7 +18,7 @@ func (mongo *MongoStorage) GetNamespaceChangesList(namespace string, startTime t
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},
-	}).All(&result); err != nil {
+	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get namespace changes")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}

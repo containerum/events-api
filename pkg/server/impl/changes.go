@@ -12,7 +12,7 @@ import (
 func (ea *EventsActionsImpl) GetNamespaceChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ns := params.ByName("namespace")
 	ea.log.WithField("namespace", ns).Debugln("Getting namespace changes")
-	changes, err := ea.mongo.GetNamespaceChangesList(ns, startTime)
+	changes, err := ea.mongo.GetNamespaceChangesList(ns, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
