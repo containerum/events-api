@@ -17,7 +17,7 @@ type EventsHandlers struct {
 	*m.TranslateValidate
 }
 
-type eventsFunc func(gin.Params, int, time.Time) (*model.EventsList, error)
+type eventsFunc func(params gin.Params, limit int, startFrom time.Time) (*model.EventsList, error)
 
 func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc eventsFunc) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
@@ -34,4 +34,21 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 		}
 		ctx.JSON(http.StatusOK, resp)
 	}
+}
+
+func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit,
+		h.GetNamespaceChanges,
+		h.GetNamespaceDeploymentsChanges,
+		h.GetNamespaceServicesChanges,
+		h.GetNamespaceIngressesChanges,
+		h.GetNamespaceConfigMapsChanges,
+		h.GetNamespaceSecretsChanges,
+		h.GetNamespacePVCsChanges,
+		h.GetNamespacePodsEvents,
+		h.GetNamespacePVCsEvents)
 }
