@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	m "github.com/containerum/events-api/pkg/router/middleware"
@@ -41,14 +42,40 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit,
-		h.GetNamespaceChanges,
-		h.GetNamespaceDeploymentsChanges,
-		h.GetNamespaceServicesChanges,
-		h.GetNamespaceIngressesChanges,
-		h.GetNamespaceConfigMapsChanges,
-		h.GetNamespaceSecretsChanges,
-		h.GetNamespacePVCsChanges,
-		h.GetNamespacePodsEvents,
-		h.GetNamespacePVCsEvents)
+	withWS(ctx, limit, h.GetEventsFuncs(true)...)
+}
+
+func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, h.GetEventsFuncs(false, strings.Split(ctx.Query("res"), ",")...)...)
+}
+
+func (h *EventsHandlers) GetEventsFuncs(all bool, events ...string) (eventFuncs []eventsFunc) {
+	var getMap = map[string]eventsFunc{
+		"ns":         h.GetNamespaceChanges,
+		"deploy":     h.GetNamespaceDeploymentsChanges,
+		"svc":        h.GetNamespaceServicesChanges,
+		"ingress":    h.GetNamespaceIngressesChanges,
+		"cm":         h.GetNamespaceConfigMapsChanges,
+		"secret":     h.GetNamespaceSecretsChanges,
+		"pvc":        h.GetNamespacePVCsChanges,
+		"events-pod": h.GetNamespacePodsEvents,
+		"events-pvc": h.GetNamespacePVCsEvents,
+	}
+	if all {
+		for _, newFunc := range getMap {
+			eventFuncs = append(eventFuncs, newFunc)
+		}
+	} else {
+		for _, event := range events {
+			newFunc, ok := getMap[event]
+			if ok {
+				eventFuncs = append(eventFuncs, newFunc)
+			}
+		}
+	}
+	return
 }
