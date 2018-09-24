@@ -37,12 +37,28 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 	}
 }
 
+func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, h.GetEventsFuncs(true, true)...)
+}
+
+func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, h.GetEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
+}
+
 func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.GetEventsFuncs(true)...)
+	withWS(ctx, limit, h.GetEventsFuncs(true, false)...)
 }
 
 func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context) {
@@ -50,21 +66,37 @@ func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context)
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.GetEventsFuncs(false, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, limit, h.GetEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
-func (h *EventsHandlers) GetEventsFuncs(all bool, events ...string) (eventFuncs []eventsFunc) {
-	var getMap = map[string]eventsFunc{
-		"ns":         h.GetNamespaceChanges,
-		"deploy":     h.GetNamespaceDeploymentsChanges,
-		"svc":        h.GetNamespaceServicesChanges,
-		"ingress":    h.GetNamespaceIngressesChanges,
-		"cm":         h.GetNamespaceConfigMapsChanges,
-		"secret":     h.GetNamespaceSecretsChanges,
-		"pvc":        h.GetNamespacePVCsChanges,
-		"events-pod": h.GetNamespacePodsEvents,
-		"events-pvc": h.GetNamespacePVCsEvents,
+func (h *EventsHandlers) GetEventsFuncs(all bool, ns bool, events ...string) (eventFuncs []eventsFunc) {
+	var getMap = map[string]eventsFunc{}
+	if ns {
+		getMap = map[string]eventsFunc{
+			"ns":         h.GetNamespaceChanges,
+			"deploy":     h.GetNamespaceDeploymentsChanges,
+			"svc":        h.GetNamespaceServicesChanges,
+			"ingress":    h.GetNamespaceIngressesChanges,
+			"cm":         h.GetNamespaceConfigMapsChanges,
+			"secret":     h.GetNamespaceSecretsChanges,
+			"pvc":        h.GetNamespacePVCsChanges,
+			"events-pod": h.GetNamespacePodsEvents,
+			"events-pvc": h.GetNamespacePVCsEvents,
+		}
+	} else {
+		getMap = map[string]eventsFunc{
+			"ns":         h.GetAllNamespacesChanges,
+			"deploy":     h.GetAllNamespacesDeploymentsChanges,
+			"svc":        h.GetAllNamespacesServicesChanges,
+			"ingress":    h.GetAllNamespacesIngressesChanges,
+			"cm":         h.GetAllNamespacesConfigMapsChanges,
+			"secret":     h.GetAllNamespacesSecretsChanges,
+			"pvc":        h.GetAllNamespacesPVCsChanges,
+			"events-pod": h.GetAllNamespacesPodsEvents,
+			"events-pvc": h.GetAllNamespacesPVCsEvents,
+		}
 	}
+
 	if all {
 		for _, newFunc := range getMap {
 			eventFuncs = append(eventFuncs, newFunc)
