@@ -59,7 +59,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
-		go EventAgregator{
+		go EventAggregator{
 			Ctx:         ctx,
 			Limit:       limit,
 			EventSource: eventSource,
@@ -76,7 +76,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 		BatchDrain:        finalChan,
 		PreallocBatchSize: 16,
 		EventSource:       resultChan,
-		Сontrol:           control,
+		Control:           control,
 	}.Run()
 
 	go func() {
@@ -124,12 +124,12 @@ type EventBatcher struct {
 	Quant             time.Duration
 	EventSource       <-chan model.Event
 	BatchDrain        chan<- []model.Event
-	Сontrol           *gocontrol.Guard
+	Control           *gocontrol.Guard
 	PreallocBatchSize int
 }
 
 func (batcher EventBatcher) Run() {
-	defer batcher.Сontrol.Go()()
+	defer batcher.Control.Go()()
 
 	var ctx = batcher.Ctx
 	var aborted = AbortWaiter(ctx.IsAborted)
@@ -158,7 +158,7 @@ func (batcher EventBatcher) Run() {
 	}
 }
 
-type EventAgregator struct {
+type EventAggregator struct {
 	Ctx         *gin.Context
 	StartAt     time.Time
 	Limit       int
@@ -168,23 +168,23 @@ type EventAgregator struct {
 	Control     *gocontrol.Guard
 }
 
-func (agregate EventAgregator) Run() {
-	defer agregate.Control.Go()()
+func (aggregate EventAggregator) Run() {
+	defer aggregate.Control.Go()()
 
-	var ctx = agregate.Ctx
-	var getfunc = agregate.EventSource
-	var funcLimit = agregate.Limit
-	var startTime = agregate.StartAt
-	var resultChan = agregate.EventDrain
-	var errChan = agregate.ErrChan
-	var aborted = AbortWaiter(agregate.Ctx.IsAborted)
+	var ctx = aggregate.Ctx
+	var getfunc = aggregate.EventSource
+	var funcLimit = aggregate.Limit
+	var startTime = aggregate.StartAt
+	var resultChan = aggregate.EventDrain
+	var errChan = aggregate.ErrChan
+	var aborted = AbortWaiter(aggregate.Ctx.IsAborted)
 	var firstEventSend = false
 
 	for {
 		select {
 		case <-aborted: //If context aborted finish goroutine
 			return
-		case <-agregate.Ctx.Done():
+		case <-aggregate.Ctx.Done():
 			return
 		default:
 			resp, err := getfunc(ctx.Params, funcLimit, startTime)
@@ -197,7 +197,7 @@ func (agregate EventAgregator) Run() {
 				select {
 				case <-aborted: //If context aborted finish goroutine
 					return
-				case <-agregate.Ctx.Done():
+				case <-aggregate.Ctx.Done():
 					return
 				case resultChan <- event:
 					continue batchLoop
