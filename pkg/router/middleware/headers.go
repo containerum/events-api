@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"github.com/containerum/kube-client/pkg/model"
 
 	"github.com/containerum/events-api/pkg/eaerrors"
 
@@ -12,14 +12,13 @@ import (
 	"errors"
 
 	"github.com/containerum/cherry/adaptors/gonic"
-	"github.com/containerum/events-api/pkg/models/headers"
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-gonic/gin"
 	"github.com/json-iterator/go"
 	"github.com/sirupsen/logrus"
 )
 
-type UserHeaderDataMap map[string]headers.UserHeaderData
+type UserHeaderDataMap map[string]model.UserHeaderData
 
 const (
 	UserNamespaces = "user-namespaces"
@@ -51,7 +50,7 @@ func RequiredUserHeaders() gin.HandlerFunc {
 				userNs, errNs := checkUserNamespace(GetHeader(ctx, httputil.UserNamespacesXHeader))
 				if errNs != nil {
 					logrus.WithField("Value", GetHeader(ctx, httputil.UserNamespacesXHeader)).WithError(errNs).Warn("Check User-Namespace header Error")
-					gonic.Gonic(eaerrors.ErrValidation().AddDetails(fmt.Sprintf("%v: %v", httputil.UserNamespacesXHeader, errNs)), ctx)
+					gonic.Gonic(eaerrors.ErrValidation().AddDetailF("%v: %v", httputil.UserNamespacesXHeader, errNs), ctx)
 					return
 				}
 				ctx.Set(UserNamespaces, userNs)
@@ -94,7 +93,7 @@ func ParseUserHeaderData(str string) (*UserHeaderDataMap, error) {
 		logrus.WithError(err).WithField("Value", str).Warn("unable to decode user header data")
 		return nil, errors.New("unable to decode user header data")
 	}
-	var userData []headers.UserHeaderData
+	var userData []model.UserHeaderData
 	err = jsoniter.Unmarshal(data, &userData)
 	if err != nil {
 		logrus.WithError(err).WithField("Value", string(data)).Warn("unable to unmarshal user header data")
