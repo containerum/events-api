@@ -9,30 +9,39 @@ import (
 
 type EventsActions interface {
 	GetNamespaceChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetDeploymentChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespaceDeploymentsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesDeploymentsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetServiceChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespaceServicesChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesServicesChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetIngressChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespaceIngressesChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesIngressesChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetPVCChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePVCsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesPVCsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetSecretChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespaceSecretsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesSecretsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetConfigMapChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespaceConfigMapsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesConfigMapsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetPodEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesPodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetPVCEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePVCsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesPVCsEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetUsersEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetSystemEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)

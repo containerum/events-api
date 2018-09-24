@@ -19,6 +19,15 @@ func (ea *EventsActionsImpl) GetNamespaceChanges(params gin.Params, limit int, s
 	return &model.EventsList{Events: changes}, nil
 }
 
+func (ea *EventsActionsImpl) GetAllNamespacesChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting all namespaces changes")
+	changes, err := ea.mongo.GetAllNamespacesChangesList(limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
 func (ea *EventsActionsImpl) GetDeploymentChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ns := params.ByName("namespace")
 	deploy := params.ByName("deployment")
@@ -34,6 +43,15 @@ func (ea *EventsActionsImpl) GetNamespaceDeploymentsChanges(params gin.Params, l
 	ns := params.ByName("namespace")
 	ea.log.WithField("namespace", ns).Debugln("Getting deployments changes")
 	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.DeploymentCollection, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetAllNamespacesDeploymentsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting deployments changes")
+	changes, err := ea.mongo.GetAllChangesList(mongodb.DeploymentCollection, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +79,15 @@ func (ea *EventsActionsImpl) GetNamespaceServicesChanges(params gin.Params, limi
 	return &model.EventsList{Events: changes}, nil
 }
 
+func (ea *EventsActionsImpl) GetAllNamespacesServicesChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting services changes")
+	changes, err := ea.mongo.GetAllChangesList(mongodb.ServiceCollection, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
 func (ea *EventsActionsImpl) GetIngressChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ns := params.ByName("namespace")
 	ingr := params.ByName("ingress")
@@ -76,6 +103,15 @@ func (ea *EventsActionsImpl) GetNamespaceIngressesChanges(params gin.Params, lim
 	ns := params.ByName("namespace")
 	ea.log.WithField("namespace", ns).Debugln("Getting ingresses changes")
 	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.IngressCollection, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetAllNamespacesIngressesChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting ingresses changes")
+	changes, err := ea.mongo.GetAllChangesList(mongodb.IngressCollection, limit, startTime)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +139,15 @@ func (ea *EventsActionsImpl) GetNamespacePVCsChanges(params gin.Params, limit in
 	return &model.EventsList{Events: changes}, nil
 }
 
+func (ea *EventsActionsImpl) GetAllNamespacesPVCsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting PVCs changes")
+	changes, err := ea.mongo.GetAllChangesList(mongodb.PVCCollection, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
 func (ea *EventsActionsImpl) GetSecretChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ns := params.ByName("namespace")
 	secret := params.ByName("pvc")
@@ -124,6 +169,15 @@ func (ea *EventsActionsImpl) GetNamespaceSecretsChanges(params gin.Params, limit
 	return &model.EventsList{Events: changes}, nil
 }
 
+func (ea *EventsActionsImpl) GetAllNamespacesSecretsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting secrets changes")
+	changes, err := ea.mongo.GetAllChangesList(mongodb.SecretsCollection, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
 func (ea *EventsActionsImpl) GetConfigMapChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ns := params.ByName("namespace")
 	cm := params.ByName("configmap")
@@ -139,6 +193,15 @@ func (ea *EventsActionsImpl) GetNamespaceConfigMapsChanges(params gin.Params, li
 	ns := params.ByName("namespace")
 	ea.log.WithField("namespace", ns).Debugln("Getting configmaps changes")
 	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.ConfigMapsCollection, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetAllNamespacesConfigMapsChanges(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting configmaps changes")
+	changes, err := ea.mongo.GetAllChangesList(mongodb.ConfigMapsCollection, limit, startTime)
 	if err != nil {
 		return nil, err
 	}

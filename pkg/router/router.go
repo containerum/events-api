@@ -66,10 +66,13 @@ func systemHandlersSetup(router gin.IRouter, status *model.ServiceStatus, enable
 func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions) {
 	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv}
 
+	router.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)
+	router.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler)
+
 	allEvents := router.Group("/namespaces/:namespace")
 	{
-		allEvents.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)
-		allEvents.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler)
+		allEvents.GET("/all", eventsHandlers.AllNamespaceResourcesChangesEventsHandler)
+		allEvents.GET("/selected", eventsHandlers.SelectedNamespaceResourcesChangesEventsHandler)
 	}
 
 	containerumEvents := router.Group("/events/containerum")

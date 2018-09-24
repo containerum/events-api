@@ -47,6 +47,15 @@ func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, limit int
 	return &model.EventsList{Events: events}, nil
 }
 
+func (ea *EventsActionsImpl) GetAllNamespacesPodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting pods events")
+	events, err := ea.mongo.GetAllEventsList(model.TypePod, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
 func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ns := params.ByName("namespace")
 	pvc := params.ByName("pvc")
@@ -62,6 +71,15 @@ func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, limit int
 	ns := params.ByName("namespace")
 	ea.log.WithField("namespace", ns).Debugln("Getting PVCs events")
 	events, err := ea.mongo.GetEventsInNamespaceList(ns, model.TypeVolume, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
+func (ea *EventsActionsImpl) GetAllNamespacesPVCsEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting PVCs events")
+	events, err := ea.mongo.GetAllEventsList(model.TypeVolume, limit, startTime)
 	if err != nil {
 		return nil, err
 	}

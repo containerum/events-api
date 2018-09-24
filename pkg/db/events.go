@@ -43,6 +43,22 @@ func (mongo *MongoStorage) GetEventsInNamespaceList(namespace string, resourcety
 	return result, nil
 }
 
+func (mongo *MongoStorage) GetAllEventsList(resourcetype model.ResourceType, limit int, startTime time.Time) ([]model.Event, error) {
+	mongo.logger.WithField("collection", mongodb.EventsCollection).Debugf("getting events in all namespaces")
+	var collection = mongo.db.C(mongodb.EventsCollection)
+	result := make([]model.Event, 0)
+	if err := collection.Find(bson.M{
+		"resourcetype": resourcetype,
+		"dateadded": bson.M{
+			"$gte": startTime,
+		},
+	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
+		mongo.logger.WithError(err).Errorf("unable to get events in namespace")
+		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
+	}
+	return result, nil
+}
+
 func (mongo *MongoStorage) AddContainerumEvent(collectionName string, event model.Event) error {
 	mongo.logger.WithField("collection", collectionName).Debugf("adding event")
 	var collection = mongo.db.C(collectionName)
