@@ -37,39 +37,147 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 	}
 }
 
+// swagger:operation GET /namespaces/{namespace}/all AllEvents AllNamespaceResourcesChangesEvents
+// Get all events in namespace.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: namespace
+//    in: path
+//    type: string
+//    required: true
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.GetEventsFuncs(true, true)...)
+	withWS(ctx, limit, h.getEventsFuncs(true, true)...)
 }
 
+// swagger:operation GET /namespaces/{namespace}/selected AllEvents SelectedNamespaceResourcesChangesEvents
+// Get selected events in namespace.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: namespace
+//    in: path
+//    type: string
+//    required: true
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: res
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.GetEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, limit, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
+// swagger:operation GET /all AllEvents AllResourcesChangesEvents
+// Get all events.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.GetEventsFuncs(true, false)...)
+	withWS(ctx, limit, h.getEventsFuncs(true, false)...)
 }
 
+// swagger:operation GET /selected AllEvents SelectedResourcesChangesEvents
+// Get selected events.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: res
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.GetEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, limit, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
-func (h *EventsHandlers) GetEventsFuncs(all bool, ns bool, events ...string) (eventFuncs []eventsFunc) {
+func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFuncs []eventsFunc) {
 	var getMap = map[string]eventsFunc{}
 	if ns {
 		getMap = map[string]eventsFunc{

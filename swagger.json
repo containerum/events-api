@@ -11,7 +11,1603 @@
     "title": "Events-API",
     "version": "0.0.1"
   },
-  "paths": {},
+  "paths": {
+    "/all": {
+      "get": {
+        "tags": [
+          "AllEvents"
+        ],
+        "summary": "Get all events.",
+        "operationId": "AllResourcesChangesEvents",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace changes.",
+        "operationId": "GetNamespaceChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/configmaps": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace configmaps changes.",
+        "operationId": "GetNamespaceConfigMapsChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/configmaps/{configmap}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get configmap changes.",
+        "operationId": "GetConfigMapChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "configmap",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/deployments": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace deployments changes.",
+        "operationId": "GetNamespaceDeploymentsChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/deployments/{deployment}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get deployment changes.",
+        "operationId": "GetDeploymentChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "deployment",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/ingresses": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace ingresses changes.",
+        "operationId": "GetNamespaceIngressesChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/ingresses/{ingress}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get ingress changes.",
+        "operationId": "GetIngressChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ingress",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/pvc": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace PVCs changes.",
+        "operationId": "GetNamespacePVCsChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/pvc/{pvc}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get PVC changes.",
+        "operationId": "GetPVCChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "pvc",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/secrets": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace secrets changes.",
+        "operationId": "GetNamespaceSecretsChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/secrets/{secret}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get secret changes.",
+        "operationId": "GetSecretChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "secret",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/services": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get namespace services changes.",
+        "operationId": "GetNamespaceServicesChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/changes/namespaces/{namespace}/services/{service}": {
+      "get": {
+        "tags": [
+          "Changes"
+        ],
+        "summary": "Get service changes.",
+        "operationId": "GetServiceChangesList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "service",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/events/containerum/system": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get system events.",
+        "operationId": "GetSystemEventsList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Add system event.",
+        "operationId": "AddSystemEvent",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Event"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "event added"
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/events/containerum/users": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get users events.",
+        "operationId": "GetUsersEventsList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Add user event.",
+        "operationId": "AddUserEvent",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Event"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "event added"
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/events/namespaces/{namespace}/pods": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get namespace pods events.",
+        "operationId": "GetNamespacePodsEventsList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/events/namespaces/{namespace}/pods/{pod}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get pod events.",
+        "operationId": "GetPodEventsList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "pod",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/events/namespaces/{namespace}/pvc": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get namespace PVCs events.",
+        "operationId": "GetNamespacePVCsEventsList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/events/namespaces/{namespace}/pvc/{pvc}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get PVC events.",
+        "operationId": "GetPVCEventsList",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "pvc",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "200": {
+            "description": "events list",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/namespaces/{namespace}/all": {
+      "get": {
+        "tags": [
+          "AllEvents"
+        ],
+        "summary": "Get all events in namespace.",
+        "operationId": "AllNamespaceResourcesChangesEvents",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/namespaces/{namespace}/selected": {
+      "get": {
+        "tags": [
+          "AllEvents"
+        ],
+        "summary": "Get selected events in namespace.",
+        "operationId": "SelectedNamespaceResourcesChangesEvents",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "namespace",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "res",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    },
+    "/selected": {
+      "get": {
+        "tags": [
+          "AllEvents"
+        ],
+        "summary": "Get selected events.",
+        "operationId": "SelectedResourcesChangesEvents",
+        "parameters": [
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "ws",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "res",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "websocket response",
+            "schema": {
+              "$ref": "#/definitions/EventsList"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
+            }
+          }
+        },
+        "x-method-visibility": "public"
+      }
+    }
+  },
   "definitions": {
     "AccessLevel": {
       "type": "string",
@@ -1460,7 +3056,6 @@
       ],
       "properties": {
         "access": {
-          "type": "string",
           "$ref": "#/definitions/AccessLevel"
         },
         "id": {
@@ -1474,7 +3069,7 @@
           "x-go-name": "Label"
         }
       },
-      "x-go-package": "github.com/containerum/events-api/pkg/models/headers"
+      "x-go-package": "github.com/containerum/events-api/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "Version": {
       "description": "Version represents a semver compatible version",
@@ -1583,6 +3178,56 @@
         }
       },
       "x-go-package": "github.com/containerum/events-api/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "allResourcesChangesEventsDefaultBody": {
+      "description": "Err -- standard serializable API error\nMessage -- constant error message:\n+ \"invalid username\"\n+ \"quota exceeded\"\n+ \"validation error\"\n...etc...\nID -- unique error identification code\nDetails -- optional context error messages kinda\n+ \"field 'Replicas' must be non-zero value\"\n+ \"not enough tights to feed gopher\"\n+ \"resource 'God' does't exist\"\nFields -- optional set of key-value pairs",
+      "type": "object",
+      "properties": {
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Details"
+        },
+        "fields": {
+          "description": "Fields -- represents additional key-value fields of error",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-go-package": "github.com/containerum/cherry"
+        },
+        "id": {
+          "description": "ErrID -- represents unique error ID",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "description": "ErrKind -- represents kind of error",
+              "type": "integer",
+              "format": "uint64",
+              "x-go-package": "github.com/containerum/cherry"
+            },
+            "sid": {
+              "description": "ErrSID -- represents service ID of error",
+              "type": "string",
+              "x-go-package": "github.com/containerum/cherry"
+            }
+          },
+          "x-go-package": "github.com/containerum/cherry"
+        },
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        },
+        "status_http": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "StatusHTTP"
+        }
+      },
+      "x-go-gen-location": "operations",
+      "x-go-package": "github.com/containerum/cherry"
     }
   },
   "parameters": {
@@ -1614,53 +3259,7 @@
     "error": {
       "description": "cherry error",
       "schema": {
-        "description": "Err -- standard serializable API error\nMessage -- constant error message:\n+ \"invalid username\"\n+ \"quota exceeded\"\n+ \"validation error\"\n...etc...\nID -- unique error identification code\nDetails -- optional context error messages kinda\n+ \"field 'Replicas' must be non-zero value\"\n+ \"not enough tights to feed gopher\"\n+ \"resource 'God' does't exist\"\nFields -- optional set of key-value pairs",
-        "type": "object",
-        "properties": {
-          "details": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "Details"
-          },
-          "fields": {
-            "description": "Fields -- represents additional key-value fields of error",
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "x-go-package": "github.com/containerum/cherry"
-          },
-          "id": {
-            "description": "ErrID -- represents unique error ID",
-            "type": "object",
-            "properties": {
-              "kind": {
-                "description": "ErrKind -- represents kind of error",
-                "type": "integer",
-                "format": "uint64",
-                "x-go-package": "github.com/containerum/cherry"
-              },
-              "sid": {
-                "description": "ErrSID -- represents service ID of error",
-                "type": "string",
-                "x-go-package": "github.com/containerum/cherry"
-              }
-            },
-            "x-go-package": "github.com/containerum/cherry"
-          },
-          "message": {
-            "type": "string",
-            "x-go-name": "Message"
-          },
-          "status_http": {
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "StatusHTTP"
-          }
-        },
-        "x-go-package": "github.com/containerum/cherry"
+        "$ref": "#/definitions/allResourcesChangesEventsDefaultBody"
       }
     }
   }
