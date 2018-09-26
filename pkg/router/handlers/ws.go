@@ -99,7 +99,9 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 						return timei.Before(timej)
 					})
 					limitOnce.Do(func() {
-						result = result[:limit]
+						if limit < len(result) {
+							result = result[:limit]
+						}
 					})
 
 					logrus.Infof("Writing %v events", len(result))
