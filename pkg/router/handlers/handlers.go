@@ -25,10 +25,14 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 	if err != nil {
 		logrus.Warn(err)
 	}
+	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
+	if err != nil {
+		logrus.Warn(err)
+	}
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, limit, getFunc)
+		withWS(ctx, limit, startTime, getFunc)
 	} else {
-		resp, err := getFunc(ctx.Params, limit, time.Time{})
+		resp, err := getFunc(ctx.Params, limit, startTime)
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -69,7 +73,11 @@ func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Cont
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.getEventsFuncs(true, true)...)
+	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, startTime, h.getEventsFuncs(true, true)...)
 }
 
 // swagger:operation GET /namespaces/{namespace}/selected AllEvents SelectedNamespaceResourcesChangesEvents
@@ -108,7 +116,11 @@ func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
+	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, startTime, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
 // swagger:operation GET /all AllEvents AllResourcesChangesEvents
@@ -139,7 +151,11 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.getEventsFuncs(true, false)...)
+	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, startTime, h.getEventsFuncs(true, false)...)
 }
 
 // swagger:operation GET /selected AllEvents SelectedResourcesChangesEvents
@@ -174,7 +190,11 @@ func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context)
 	if err != nil {
 		logrus.Warn(err)
 	}
-	withWS(ctx, limit, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
+	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
+	if err != nil {
+		logrus.Warn(err)
+	}
+	withWS(ctx, limit, startTime, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
 func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFuncs []eventsFunc) {

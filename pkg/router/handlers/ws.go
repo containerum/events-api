@@ -17,7 +17,7 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
+func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...eventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
 
@@ -66,6 +66,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 			EventDrain:  resultChan,
 			ErrChan:     errChan,
 			Control:     control,
+			StartAt:     startTime,
 		}.Run()
 	}
 
