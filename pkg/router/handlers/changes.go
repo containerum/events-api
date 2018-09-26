@@ -24,6 +24,10 @@ import (
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -63,6 +67,10 @@ func (h *EventsHandlers) GetNamespaceChangesListHandler(ctx *gin.Context) {
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -95,6 +103,10 @@ func (h *EventsHandlers) GetDeploymentChangesListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -137,6 +149,10 @@ func (h *EventsHandlers) GetNamespaceDeploymentsChangesListHandler(ctx *gin.Cont
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -169,6 +185,10 @@ func (h *EventsHandlers) GetServiceChangesListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -211,6 +231,10 @@ func (h *EventsHandlers) GetNamespaceServicesChangesListHandler(ctx *gin.Context
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -243,6 +267,10 @@ func (h *EventsHandlers) GetIngressChangesListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -285,6 +313,10 @@ func (h *EventsHandlers) GetNamespaceIngressesChangesListHandler(ctx *gin.Contex
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -317,6 +349,10 @@ func (h *EventsHandlers) GetPVCChangesListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -359,6 +395,10 @@ func (h *EventsHandlers) GetNamespacePVCsChangesListHandler(ctx *gin.Context) {
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -391,6 +431,10 @@ func (h *EventsHandlers) GetSecretChangesListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -433,6 +477,10 @@ func (h *EventsHandlers) GetNamespaceSecretsChangesListHandler(ctx *gin.Context)
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -465,6 +513,10 @@ func (h *EventsHandlers) GetConfigMapChangesListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false

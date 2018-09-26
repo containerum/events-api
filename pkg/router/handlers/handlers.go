@@ -61,6 +61,10 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '101':
 //    description: websocket response
@@ -104,6 +108,10 @@ func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Cont
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '101':
 //    description: websocket response
@@ -136,6 +144,10 @@ func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -175,6 +187,10 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: res
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
