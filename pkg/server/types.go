@@ -37,14 +37,14 @@ type EventsActions interface {
 
 	GetPodEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
-	GetAllNamespacesPodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetAllNamespacesPodsEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	GetPVCEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetNamespacePVCsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetAllNamespacesPVCsEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
-	GetUsersEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
-	GetSystemEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetUsersEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+	GetSystemEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
 	AddUserEvent(event model.Event) error
 	AddSystemEvent(event model.Event) error
