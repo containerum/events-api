@@ -3,6 +3,7 @@ package handlers
 import (
 	"runtime"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/ninedraft/gocontrol"
@@ -20,9 +21,6 @@ var upgrader = websocket.Upgrader{}
 func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...eventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
-
-	//Divide limit to all functions
-	limit = limit / len(getfuncs)
 
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
@@ -83,6 +81,8 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 	go func() {
 		defer control.Go()()
 
+		var limitOnce = sync.Once{}
+
 		pingTicker := ticker.NewTicker(1 * time.Second)
 		pingTicker.Start()
 		defer pingTicker.Stop()
@@ -98,6 +98,10 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 						timej, _ := time.Parse(time.RFC3339, result[j].Time)
 						return timei.Before(timej)
 					})
+					limitOnce.Do(func() {
+						result = result[:limit]
+					})
+
 					logrus.Infof("Writing %v events", len(result))
 					if err := c.WriteJSON(result); err != nil {
 						errChan <- err
