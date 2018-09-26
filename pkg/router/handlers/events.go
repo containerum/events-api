@@ -36,6 +36,10 @@ import (
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -68,6 +72,10 @@ func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false
@@ -110,6 +118,10 @@ func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -145,6 +157,10 @@ func (h *EventsHandlers) GetPVCEventsListHandler(ctx *gin.Context) {
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -176,6 +192,10 @@ func (h *EventsHandlers) GetNamespacePVCsEventsListHandler(ctx *gin.Context) {
 //    in: query
 //    type: string
 //    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
 // responses:
 //  '200':
 //    description: events list
@@ -204,6 +224,10 @@ func (h *EventsHandlers) GetUsersEventsListHandler(ctx *gin.Context) {
 //    type: string
 //    required: false
 //  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
 //    in: query
 //    type: string
 //    required: false

@@ -46,6 +46,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -104,6 +109,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -169,6 +179,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -241,6 +256,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -305,6 +325,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -377,6 +402,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -441,6 +471,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -513,6 +548,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -577,6 +617,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -649,6 +694,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -713,6 +763,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -785,6 +840,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -849,6 +909,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -921,6 +986,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -979,6 +1049,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -1083,6 +1158,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -1194,6 +1274,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1265,6 +1350,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1329,6 +1419,11 @@
           {
             "type": "string",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
@@ -1401,6 +1496,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1466,6 +1566,11 @@
             "type": "string",
             "name": "limit",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1530,6 +1635,11 @@
             "type": "string",
             "name": "res",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1587,6 +1697,11 @@
           {
             "type": "string",
             "name": "res",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "time",
             "in": "query"
           }
         ],
