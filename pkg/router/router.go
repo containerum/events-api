@@ -66,15 +66,17 @@ func systemHandlersSetup(router gin.IRouter, status *model.ServiceStatus, enable
 func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions) {
 	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv}
 
-	router.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)           //Websockets only
-	router.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler) //Websockets only
-
-	allEvents := router.Group("/namespaces/:namespace")
+	mainGroup := router.Group("/events")
 	{
-		allEvents.GET("/all", eventsHandlers.AllNamespaceResourcesChangesEventsHandler)           //Websockets only
-		allEvents.GET("/selected", eventsHandlers.SelectedNamespaceResourcesChangesEventsHandler) //Websockets only
-	}
+		mainGroup.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)           //Websockets only
+		mainGroup.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler) //Websockets only
 
+		allEvents := mainGroup.Group("/namespaces/:namespace")
+		{
+			allEvents.GET("/all", eventsHandlers.AllNamespaceResourcesChangesEventsHandler)           //Websockets only
+			allEvents.GET("/selected", eventsHandlers.SelectedNamespaceResourcesChangesEventsHandler) //Websockets only
+		}
+	}
 	containerumEvents := router.Group("/events/containerum")
 	{
 		containerumEvents.POST("/users", eventsHandlers.AddUserEventHandler)
