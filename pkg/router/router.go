@@ -66,51 +66,54 @@ func systemHandlersSetup(router gin.IRouter, status *model.ServiceStatus, enable
 func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions) {
 	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv}
 
-	router.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)           //Websockets only
-	router.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler) //Websockets only
-
-	allEvents := router.Group("/namespaces/:namespace")
+	mainGroup := router.Group("/events")
 	{
-		allEvents.GET("/all", eventsHandlers.AllNamespaceResourcesChangesEventsHandler)           //Websockets only
-		allEvents.GET("/selected", eventsHandlers.SelectedNamespaceResourcesChangesEventsHandler) //Websockets only
-	}
+		mainGroup.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)           //Websockets only
+		mainGroup.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler) //Websockets only
 
-	containerumEvents := router.Group("/events/containerum")
-	{
-		containerumEvents.POST("/users", eventsHandlers.AddUserEventHandler)
-		containerumEvents.GET("/users", eventsHandlers.GetUsersEventsListHandler)
+		allEvents := mainGroup.Group("/namespaces/:namespace")
+		{
+			allEvents.GET("/all", eventsHandlers.AllNamespaceResourcesChangesEventsHandler)           //Websockets only
+			allEvents.GET("/selected", eventsHandlers.SelectedNamespaceResourcesChangesEventsHandler) //Websockets only
+		}
 
-		containerumEvents.POST("/system", eventsHandlers.AddSystemEventHandler)
-		containerumEvents.GET("/system", eventsHandlers.GetSystemEventsListHandler)
-	}
-	events := router.Group("/events/namespaces/:namespace")
-	{
-		events.GET("/pods/:pod", eventsHandlers.GetPodEventsListHandler)
-		events.GET("/pods", eventsHandlers.GetNamespacePodsEventsListHandler)
+		containerumEvents := mainGroup.Group("/events/containerum")
+		{
+			containerumEvents.POST("/users", eventsHandlers.AddUserEventHandler)
+			containerumEvents.GET("/users", eventsHandlers.GetUsersEventsListHandler)
 
-		events.GET("/pvc/:pvc", eventsHandlers.GetPVCEventsListHandler)
-		events.GET("/pvc", eventsHandlers.GetNamespacePVCsEventsListHandler)
-	}
-	changes := router.Group("/changes/namespaces/:namespace")
-	{
-		changes.GET("", eventsHandlers.GetNamespaceChangesListHandler)
+			containerumEvents.POST("/system", eventsHandlers.AddSystemEventHandler)
+			containerumEvents.GET("/system", eventsHandlers.GetSystemEventsListHandler)
+		}
+		events := mainGroup.Group("/events/namespaces/:namespace")
+		{
+			events.GET("/pods/:pod", eventsHandlers.GetPodEventsListHandler)
+			events.GET("/pods", eventsHandlers.GetNamespacePodsEventsListHandler)
 
-		changes.GET("/deployments/:deployment", eventsHandlers.GetDeploymentChangesListHandler)
-		changes.GET("/deployments", eventsHandlers.GetNamespaceDeploymentsChangesListHandler)
+			events.GET("/pvc/:pvc", eventsHandlers.GetPVCEventsListHandler)
+			events.GET("/pvc", eventsHandlers.GetNamespacePVCsEventsListHandler)
+		}
+		changes := mainGroup.Group("/changes/namespaces/:namespace")
+		{
+			changes.GET("", eventsHandlers.GetNamespaceChangesListHandler)
 
-		changes.GET("/services/:service", eventsHandlers.GetServiceChangesListHandler)
-		changes.GET("/services", eventsHandlers.GetNamespaceServicesChangesListHandler)
+			changes.GET("/deployments/:deployment", eventsHandlers.GetDeploymentChangesListHandler)
+			changes.GET("/deployments", eventsHandlers.GetNamespaceDeploymentsChangesListHandler)
 
-		changes.GET("/ingresses/:ingress", eventsHandlers.GetIngressChangesListHandler)
-		changes.GET("/ingresses", eventsHandlers.GetNamespaceIngressesChangesListHandler)
+			changes.GET("/services/:service", eventsHandlers.GetServiceChangesListHandler)
+			changes.GET("/services", eventsHandlers.GetNamespaceServicesChangesListHandler)
 
-		changes.GET("/pvc/:pvc", eventsHandlers.GetPVCChangesListHandler)
-		changes.GET("/pvc", eventsHandlers.GetNamespacePVCsChangesListHandler)
+			changes.GET("/ingresses/:ingress", eventsHandlers.GetIngressChangesListHandler)
+			changes.GET("/ingresses", eventsHandlers.GetNamespaceIngressesChangesListHandler)
 
-		changes.GET("/secrets/:secret", eventsHandlers.GetSecretChangesListHandler)
-		changes.GET("/secrets", eventsHandlers.GetNamespaceSecretsChangesListHandler)
+			changes.GET("/pvc/:pvc", eventsHandlers.GetPVCChangesListHandler)
+			changes.GET("/pvc", eventsHandlers.GetNamespacePVCsChangesListHandler)
 
-		changes.GET("/configmaps/:configmap", eventsHandlers.GetConfigMapChangesListHandler)
-		changes.GET("/configmaps", eventsHandlers.GetNamespaceConfigMapsChangesListHandler)
+			changes.GET("/secrets/:secret", eventsHandlers.GetSecretChangesListHandler)
+			changes.GET("/secrets", eventsHandlers.GetNamespaceSecretsChangesListHandler)
+
+			changes.GET("/configmaps/:configmap", eventsHandlers.GetConfigMapChangesListHandler)
+			changes.GET("/configmaps", eventsHandlers.GetNamespaceConfigMapsChangesListHandler)
+		}
 	}
 }
