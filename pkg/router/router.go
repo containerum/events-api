@@ -115,5 +115,4 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 		changes.GET("/configmaps/:configmap", eventsHandlers.GetConfigMapChangesListHandler)
 		changes.GET("/configmaps", eventsHandlers.GetNamespaceConfigMapsChangesListHandler)
 	}
-
 }
