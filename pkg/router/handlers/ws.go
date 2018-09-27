@@ -103,7 +103,7 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 						return timei.Before(timej)
 					})
 					limitOnce.Do(func() {
-						if limit < len(result) {
+						if limit < len(result) && limit > 0 {
 							result = result[:limit]
 						}
 					})
