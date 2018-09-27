@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"runtime"
 	"sort"
 	"sync"
@@ -16,12 +17,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...eventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
-
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		logrus.Debug(err)
