@@ -100,7 +100,7 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 					sort.Slice(result, func(i, j int) bool {
 						timei, _ := time.Parse(time.RFC3339, result[i].Time)
 						timej, _ := time.Parse(time.RFC3339, result[j].Time)
-						return timei.Before(timej)
+						return timei.After(timej)
 					})
 					limitOnce.Do(func() {
 						if limit < len(result) && limit > 0 {
