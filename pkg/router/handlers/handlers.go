@@ -214,7 +214,7 @@ func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context)
 }
 
 func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFuncs []eventsFunc) {
-	var getMap = map[string]eventsFunc{}
+	var getMap map[string]eventsFunc
 	if ns {
 		getMap = map[string]eventsFunc{
 			"ns":         h.GetNamespaceChanges,
@@ -253,5 +253,5 @@ func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFu
 			}
 		}
 	}
-	return
+	return eventFuncs
 }
