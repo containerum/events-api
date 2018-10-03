@@ -43,6 +43,8 @@ type EventsActions interface {
 	GetNamespacePVCsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetAllNamespacesPVCsEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
+	GetAllNodesEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
+
 	GetUsersEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 	GetSystemEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error)
 
