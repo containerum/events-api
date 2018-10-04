@@ -86,6 +86,15 @@ func (ea *EventsActionsImpl) GetAllNamespacesPVCsEvents(_ gin.Params, limit int,
 	return &model.EventsList{Events: events}, nil
 }
 
+func (ea *EventsActionsImpl) GetAllNodesEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+	ea.log.Debugln("Getting nodes events")
+	events, err := ea.mongo.GetAllEventsList(model.TypeNode, limit, startTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.EventsList{Events: events}, nil
+}
+
 func (ea *EventsActionsImpl) GetUsersEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
 	ea.log.Debugln("Getting users events")
 	events, err := ea.mongo.GetUsersEventsList(limit, startTime)

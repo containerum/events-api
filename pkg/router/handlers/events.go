@@ -309,3 +309,38 @@ func (h *EventsHandlers) AddSystemEventHandler(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusAccepted)
 }
+
+// swagger:operation GET /events/nodes Events GetNodesEventsLis
+// Get nodes events.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '200':
+//    description: events list
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
+func (h *EventsHandlers) GetNodesEventsListHandler(ctx *gin.Context) {
+	handleResourceChangesEvents(h, ctx, h.GetAllNodesEvents)
+}

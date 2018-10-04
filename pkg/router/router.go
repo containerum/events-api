@@ -70,6 +70,7 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 	{
 		mainGroup.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)           //Websockets only
 		mainGroup.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler) //Websockets only
+		mainGroup.GET("/nodes", eventsHandlers.GetNodesEventsListHandler)                //Websockets only
 
 		allEvents := mainGroup.Group("/namespaces/:namespace")
 		{

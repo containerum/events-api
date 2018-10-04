@@ -10,7 +10,6 @@ import (
 	"github.com/containerum/events-api/pkg/server"
 	"github.com/containerum/kube-client/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type EventsHandlers struct {
@@ -21,14 +20,8 @@ type EventsHandlers struct {
 type eventsFunc func(params gin.Params, limit int, startFrom time.Time) (*model.EventsList, error)
 
 func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc eventsFunc) {
-	limit, err := strconv.Atoi(ctx.Query("limit"))
-	if err != nil {
-		logrus.Warn(err)
-	}
-	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
-	if err != nil {
-		logrus.Warn(err)
-	}
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	if _, ws := ctx.GetQuery("ws"); ws {
 		withWS(ctx, limit, startTime, getFunc)
 	} else {
@@ -73,14 +66,8 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, err := strconv.Atoi(ctx.Query("limit"))
-	if err != nil {
-		logrus.Warn(err)
-	}
-	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
-	if err != nil {
-		logrus.Warn(err)
-	}
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	withWS(ctx, limit, startTime, h.getEventsFuncs(true, true)...)
 }
 
@@ -120,14 +107,8 @@ func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Cont
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, err := strconv.Atoi(ctx.Query("limit"))
-	if err != nil {
-		logrus.Warn(err)
-	}
-	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
-	if err != nil {
-		logrus.Warn(err)
-	}
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	withWS(ctx, limit, startTime, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
@@ -159,14 +140,8 @@ func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, err := strconv.Atoi(ctx.Query("limit"))
-	if err != nil {
-		logrus.Warn(err)
-	}
-	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
-	if err != nil {
-		logrus.Warn(err)
-	}
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	withWS(ctx, limit, startTime, h.getEventsFuncs(true, false)...)
 }
 
@@ -202,14 +177,8 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, err := strconv.Atoi(ctx.Query("limit"))
-	if err != nil {
-		logrus.Warn(err)
-	}
-	startTime, err := time.Parse(time.RFC3339, ctx.Query("time"))
-	if err != nil {
-		logrus.Warn(err)
-	}
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	withWS(ctx, limit, startTime, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
