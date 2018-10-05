@@ -1,13 +1,15 @@
 package main
 
 import (
+	"time"
+
 	"github.com/containerum/events-api/pkg/db"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/en_US"
 	"github.com/go-playground/universal-translator"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -53,21 +55,27 @@ var flags = []cli.Flag{
 		Name:   "mongo_addr",
 		Usage:  "MongoDB address",
 	},
+	cli.DurationFlag{
+		EnvVar: "DB_REQUEST_PERIOD",
+		Name:   "db_request_period",
+		Usage:  "DB requests period (for websocket requests)",
+		Value:  60 * time.Second,
+	},
 }
 
 func setupLogs(c *cli.Context) {
 	if c.Bool("debug") {
 		gin.SetMode(gin.DebugMode)
-		logrus.SetLevel(logrus.DebugLevel)
+		log.SetLevel(log.DebugLevel)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
-		logrus.SetLevel(logrus.InfoLevel)
+		log.SetLevel(log.InfoLevel)
 	}
 
 	if c.Bool("textlog") {
-		logrus.SetFormatter(&logrus.TextFormatter{})
+		log.SetFormatter(&log.TextFormatter{})
 	} else {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
+		log.SetFormatter(&log.JSONFormatter{})
 	}
 }
 
@@ -84,7 +92,7 @@ func setupMongo(c *cli.Context) (*db.MongoStorage, error) {
 		Mechanism: "SCRAM-SHA-1",
 	}
 	cfg := db.MongoConfig{
-		Logger:   logrus.WithField("component", "mongo"),
+		Logger:   log.WithField("component", "mongo"),
 		Debug:    c.Bool("debug"),
 		DialInfo: dialInfo,
 	}

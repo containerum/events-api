@@ -15,6 +15,7 @@ import (
 type EventsHandlers struct {
 	server.EventsActions
 	*m.TranslateValidate
+	DBPeriod time.Duration
 }
 
 type eventsFunc func(params gin.Params, limit int, startFrom time.Time) (*model.EventsList, error)
@@ -23,7 +24,7 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, limit, startTime, getFunc)
+		withWS(ctx, limit, startTime, h.DBPeriod, getFunc)
 	} else {
 		resp, err := getFunc(ctx.Params, limit, startTime)
 		if err != nil {
@@ -68,7 +69,7 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.getEventsFuncs(true, true)...)
+	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(true, true)...)
 }
 
 // swagger:operation GET /namespaces/{namespace}/selected AllEvents SelectedNamespaceResourcesChangesEvents
@@ -109,7 +110,7 @@ func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Cont
 func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
 // swagger:operation GET /all AllEvents AllResourcesChangesEvents
@@ -142,7 +143,7 @@ func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin
 func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.getEventsFuncs(true, false)...)
+	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(true, false)...)
 }
 
 // swagger:operation GET /selected AllEvents SelectedResourcesChangesEvents
@@ -179,7 +180,7 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context) {
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
 func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFuncs []eventsFunc) {

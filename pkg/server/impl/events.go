@@ -11,7 +11,7 @@ import (
 
 	"github.com/containerum/cherry/adaptors/cherrylog"
 	"github.com/containerum/events-api/pkg/db"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type EventsActionsImpl struct {
@@ -22,7 +22,7 @@ type EventsActionsImpl struct {
 func NewEventsActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 	return &EventsActionsImpl{
 		mongo: mongo,
-		log:   cherrylog.NewLogrusAdapter(logrus.WithField("component", "domain_actions")),
+		log:   cherrylog.NewLogrusAdapter(log.WithField("component", "domain_actions")),
 	}
 }
 

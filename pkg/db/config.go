@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 
 	"github.com/globalsign/mgo"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type MongoConfig struct {
-	Logger logrus.FieldLogger
+	Logger log.FieldLogger
 
 	// Debug enable the delivery of debug messages to the logger.  Only meaningful
 	// if a logger is also set.

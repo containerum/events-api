@@ -14,7 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 var upgrader = websocket.Upgrader{
@@ -23,12 +23,12 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...eventsFunc) {
+func withWS(ctx *gin.Context, limit int, startTime time.Time, dbPeriod time.Duration, getfuncs ...eventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		logrus.Debug(err)
+		log.Debug(err)
 		return
 	}
 	defer c.Close()
@@ -69,6 +69,7 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 			ErrChan:     errChan,
 			Control:     control,
 			StartAt:     startTime,
+			DBPeriod:    dbPeriod,
 		}.Run()
 	}
 
@@ -108,7 +109,7 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 						}
 					})
 
-					logrus.Infof("Writing %v events", len(result))
+					log.Infof("Writing %v events", len(result))
 					if err := c.WriteJSON(result); err != nil {
 						errChan <- err
 					}
@@ -123,7 +124,7 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, getfuncs ...events
 
 	for selecerr := range errChan {
 		if selecerr != nil {
-			logrus.Debug(selecerr)
+			log.Debug(selecerr)
 			return
 		}
 	}
@@ -177,6 +178,7 @@ type EventAggregator struct {
 	EventDrain  chan<- model.Event
 	ErrChan     chan<- error
 	Control     *gocontrol.Guard
+	DBPeriod    time.Duration
 }
 
 func (aggregate EventAggregator) Run() {
@@ -190,6 +192,7 @@ func (aggregate EventAggregator) Run() {
 	var errChan = aggregate.ErrChan
 	var aborted = AbortWaiter(aggregate.Ctx.IsAborted)
 	var firstEventSend = false
+	var dbPeriod = aggregate.DBPeriod
 
 	for {
 		select {
@@ -220,7 +223,7 @@ func (aggregate EventAggregator) Run() {
 			funcLimit = 0
 			//Get only new events
 			startTime = time.Now()
-			time.Sleep(60 * time.Second)
+			time.Sleep(dbPeriod)
 		}
 	}
 }

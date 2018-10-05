@@ -22,20 +22,20 @@ import (
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
-func CreateRouter(mongo *db.MongoStorage, status *model.ServiceStatus, tv *m.TranslateValidate, enableCORS bool) http.Handler {
+func CreateRouter(mongo *db.MongoStorage, status *model.ServiceStatus, tv *m.TranslateValidate, dbPeriod time.Duration, enableCORS bool) http.Handler {
 	e := gin.New()
 	systemHandlersSetup(e, status, enableCORS)
 	initMiddlewares(e, tv)
-	eventsHandlersSetup(e, tv, impl.NewEventsActionsImpl(mongo))
+	eventsHandlersSetup(e, tv, impl.NewEventsActionsImpl(mongo), dbPeriod)
 
 	return e
 }
 
 func initMiddlewares(e gin.IRouter, tv *m.TranslateValidate) {
-	e.Use(ginrus.Ginrus(logrus.StandardLogger(), time.RFC3339, true))
+	e.Use(ginrus.Ginrus(log.StandardLogger(), time.RFC3339, true))
 	binding.Validator = &validation.GinValidatorV9{Validate: tv.Validate} // gin has no local validator
 	e.Use(httputil.SaveHeaders)
 	e.Use(httputil.PrepareContext)
@@ -58,13 +58,13 @@ func systemHandlersSetup(router gin.IRouter, status *model.ServiceStatus, enable
 	}
 	router.Group("/static").
 		StaticFS("/", static.HTTP)
-	router.Use(gonic.Recovery(eaerrors.ErrInternal, cherrylog.NewLogrusAdapter(logrus.WithField("component", "gin_recovery"))))
+	router.Use(gonic.Recovery(eaerrors.ErrInternal, cherrylog.NewLogrusAdapter(log.WithField("component", "gin_recovery"))))
 
 	router.GET("/status", httputil.ServiceStatus(status))
 }
 
-func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions) {
-	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv}
+func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions, dbPeriod time.Duration) {
+	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv, DBPeriod: dbPeriod}
 
 	mainGroup := router.Group("/events")
 	{
