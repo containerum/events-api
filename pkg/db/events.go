@@ -26,13 +26,15 @@ func (mongo *MongoStorage) GetEventsList(namespace, resource string, resourcetyp
 	return result, nil
 }
 
-func (mongo *MongoStorage) GetEventsInNamespaceList(namespace string, resourcetype model.ResourceType, limit int, startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetEventsInNamespacesList(resourcetype model.ResourceType, limit int, startTime time.Time, namespaces ...string) ([]model.Event, error) {
 	mongo.logger.WithField("collection", mongodb.EventsCollection).Debugf("getting events in namespace")
 	var collection = mongo.db.C(mongodb.EventsCollection)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
-		"resourcenamespace": namespace,
-		"resourcetype":      resourcetype,
+		"resourcenamespace": bson.M{
+			"$in": namespaces,
+		},
+		"resourcetype": resourcetype,
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},

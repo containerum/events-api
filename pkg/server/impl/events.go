@@ -3,11 +3,11 @@ package impl
 import (
 	"time"
 
+	"github.com/containerum/events-api/pkg/model"
+
 	"github.com/containerum/kube-events/pkg/storage/mongodb"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/containerum/kube-client/pkg/model"
+	kubeModel "github.com/containerum/kube-client/pkg/model"
 
 	"github.com/containerum/cherry/adaptors/cherrylog"
 	"github.com/containerum/events-api/pkg/db"
@@ -26,109 +26,135 @@ func NewEventsActionsImpl(mongo *db.MongoStorage) *EventsActionsImpl {
 	}
 }
 
-func (ea *EventsActionsImpl) GetPodEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	pod := params.ByName("pod")
+func (ea *EventsActionsImpl) GetPodEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	pod := params.Params.ByName("pod")
+
 	ea.log.WithField("namespace", ns).WithField("pod", pod).Debugln("Getting pod events")
-	events, err := ea.mongo.GetEventsList(ns, pod, model.TypePod, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	events, err := ea.mongo.GetEventsList(ns, pod, kubeModel.TypePod, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespacePodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespacePodsEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting pods events")
-	events, err := ea.mongo.GetEventsInNamespaceList(ns, model.TypePod, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	events, err := ea.mongo.GetEventsInNamespacesList(kubeModel.TypePod, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetAllNamespacesPodsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+func (ea *EventsActionsImpl) GetAllNamespacesPodsEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
 	ea.log.Debugln("Getting pods events")
-	events, err := ea.mongo.GetAllEventsList(model.TypePod, limit, startTime)
+
+	var events []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		events, err = ea.mongo.GetAllEventsList(kubeModel.TypePod, params.Limit, params.StartTime)
+	} else {
+		events, err = ea.mongo.GetEventsInNamespacesList(kubeModel.TypePod, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetPVCEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	pvc := params.ByName("pvc")
+func (ea *EventsActionsImpl) GetPVCEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	pvc := params.Params.ByName("pvc")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting PVC events")
-	events, err := ea.mongo.GetEventsList(ns, pvc, model.TypeVolume, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	events, err := ea.mongo.GetEventsList(ns, pvc, kubeModel.TypeVolume, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespacePVCsEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting PVCs events")
-	events, err := ea.mongo.GetEventsInNamespaceList(ns, model.TypeVolume, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	events, err := ea.mongo.GetEventsInNamespacesList(kubeModel.TypeVolume, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetAllNamespacesPVCsEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+func (ea *EventsActionsImpl) GetAllNamespacesPVCsEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
 	ea.log.Debugln("Getting PVCs events")
-	events, err := ea.mongo.GetAllEventsList(model.TypeVolume, limit, startTime)
+
+	var events []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		events, err = ea.mongo.GetAllEventsList(kubeModel.TypeVolume, params.Limit, params.StartTime)
+	} else {
+		events, err = ea.mongo.GetEventsInNamespacesList(kubeModel.TypeVolume, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetAllNodesEvents(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+func (ea *EventsActionsImpl) GetAllNodesEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
 	ea.log.Debugln("Getting nodes events")
-	events, err := ea.mongo.GetAllEventsList(model.TypeNode, limit, startTime)
+	events, err := ea.mongo.GetAllEventsList(kubeModel.TypeNode, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetUsersEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+func (ea *EventsActionsImpl) GetUsersEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
 	ea.log.Debugln("Getting users events")
-	events, err := ea.mongo.GetUsersEventsList(limit, startTime)
+	events, err := ea.mongo.GetUsersEventsList(params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) GetSystemEvents(_ gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
+func (ea *EventsActionsImpl) GetSystemEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
 	ea.log.Debugln("Getting system events")
-	events, err := ea.mongo.GetSystemEventsList(limit, startTime)
+	events, err := ea.mongo.GetSystemEventsList(params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: events}, nil
+	return &kubeModel.EventsList{Events: events}, nil
 }
 
-func (ea *EventsActionsImpl) AddUserEvent(event model.Event) error {
+func (ea *EventsActionsImpl) AddUserEvent(event kubeModel.Event) error {
 	ea.log.Debugln("Adding user event")
 	event.DateAdded = time.Now()
-	event.ResourceType = model.TypeUser
+	event.ResourceType = kubeModel.TypeUser
 	if event.Kind == "" {
-		event.Kind = model.EventInfo
+		event.Kind = kubeModel.EventInfo
 	}
 	return ea.mongo.AddContainerumEvent(mongodb.UserCollection, event)
 }
 
-func (ea *EventsActionsImpl) AddSystemEvent(event model.Event) error {
+func (ea *EventsActionsImpl) AddSystemEvent(event kubeModel.Event) error {
 	ea.log.Debugln("Adding system event")
 	event.DateAdded = time.Now()
-	event.ResourceType = model.TypeSystem
+	event.ResourceType = kubeModel.TypeSystem
 	if event.Kind == "" {
-		event.Kind = model.EventInfo
+		event.Kind = kubeModel.EventInfo
 	}
 	return ea.mongo.AddContainerumEvent(mongodb.SystemCollection, event)
 }

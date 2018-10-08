@@ -24,12 +24,14 @@ func (mongo *MongoStorage) GetChangesList(namespace, resource, collectionName st
 	return result, nil
 }
 
-func (mongo *MongoStorage) GetChangesInNamespaceList(namespace, collectionName string, limit int, startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetChangesInNamespacesList(collectionName string, limit int, startTime time.Time, namespaces ...string) ([]model.Event, error) {
 	mongo.logger.WithField("collection", collectionName).Debugf("getting changes in namespace")
 	var collection = mongo.db.C(collectionName)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
-		"resourcenamespace": namespace,
+		"resourcenamespace": bson.M{
+			"$in": namespaces,
+		},
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},
