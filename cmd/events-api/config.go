@@ -15,43 +15,43 @@ import (
 
 var flags = []cli.Flag{
 	cli.BoolFlag{
-		EnvVar: "CH_EVENTS_API_DEBUG",
+		EnvVar: "DEBUG",
 		Name:   "debug",
 		Usage:  "start the server in debug mode",
 	},
 	cli.BoolFlag{
-		EnvVar: "CH_EVENTS_API_TEXTLOG",
+		EnvVar: "TEXTLOG",
 		Name:   "textlog",
 		Usage:  "output log in text format",
 	},
 	cli.StringFlag{
-		EnvVar: "CH_EVENTS_API_PORT",
+		EnvVar: "PORT",
 		Name:   "port",
 		Value:  "1667",
 		Usage:  "port for events-api server",
 	},
 	cli.BoolFlag{
-		EnvVar: "CH_EVENTS_API_CORS",
+		EnvVar: "CORS",
 		Name:   "cors",
 		Usage:  "enable CORS",
 	},
 	cli.StringFlag{
-		EnvVar: "CH_EVENTS_API_MONGO_DB",
+		EnvVar: "MONGO_DB",
 		Name:   "mongo_db",
 		Usage:  "MongoDB database name",
 	},
 	cli.StringFlag{
-		EnvVar: "CH_EVENTS_API_MONGO_LOGIN",
+		EnvVar: "MONGO_LOGIN",
 		Name:   "mongo_login",
 		Usage:  "MongoDB login",
 	},
 	cli.StringFlag{
-		EnvVar: "CH_EVENTS_API_MONGO_PASSWORD",
+		EnvVar: "MONGO_PASSWORD",
 		Name:   "mongo_password",
 		Usage:  "MongoDB password",
 	},
 	cli.StringSliceFlag{
-		EnvVar: "CH_EVENTS_API_MONGO_ADDR",
+		EnvVar: "MONGO_ADDR",
 		Name:   "mongo_addr",
 		Usage:  "MongoDB address",
 	},
