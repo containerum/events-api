@@ -6,9 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/containerum/events-api/pkg/model"
+	"github.com/containerum/utils/httputil"
+
 	m "github.com/containerum/events-api/pkg/router/middleware"
 	"github.com/containerum/events-api/pkg/server"
-	"github.com/containerum/kube-client/pkg/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,15 +20,13 @@ type EventsHandlers struct {
 	DBPeriod time.Duration
 }
 
-type eventsFunc func(params gin.Params, limit int, startFrom time.Time) (*model.EventsList, error)
+func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc model.EventsFunc) {
+	params := createParams(ctx)
 
-func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc eventsFunc) {
-	limit, _ := strconv.Atoi(ctx.Query("limit"))
-	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	if _, ws := ctx.GetQuery("ws"); ws {
-		withWS(ctx, limit, startTime, h.DBPeriod, getFunc)
+		withWS(ctx, params, h.DBPeriod, getFunc)
 	} else {
-		resp, err := getFunc(ctx.Params, limit, startTime)
+		resp, err := getFunc(params)
 		if err != nil {
 			ctx.AbortWithStatusJSON(h.HandleError(err))
 			return
@@ -67,9 +67,7 @@ func handleResourceChangesEvents(h *EventsHandlers, ctx *gin.Context, getFunc ev
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, _ := strconv.Atoi(ctx.Query("limit"))
-	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(true, true)...)
+	withWS(ctx, createParams(ctx), h.DBPeriod, h.getEventsFuncs(true, true)...)
 }
 
 // swagger:operation GET /namespaces/{namespace}/selected AllEvents SelectedNamespaceResourcesChangesEvents
@@ -108,9 +106,7 @@ func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Cont
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, _ := strconv.Atoi(ctx.Query("limit"))
-	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, createParams(ctx), h.DBPeriod, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
 // swagger:operation GET /all AllEvents AllResourcesChangesEvents
@@ -141,9 +137,7 @@ func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, _ := strconv.Atoi(ctx.Query("limit"))
-	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(true, false)...)
+	withWS(ctx, createParams(ctx), h.DBPeriod, h.getEventsFuncs(true, false)...)
 }
 
 // swagger:operation GET /selected AllEvents SelectedResourcesChangesEvents
@@ -178,15 +172,13 @@ func (h *EventsHandlers) AllResourcesChangesEventsHandler(ctx *gin.Context) {
 //  default:
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedResourcesChangesEventsHandler(ctx *gin.Context) {
-	limit, _ := strconv.Atoi(ctx.Query("limit"))
-	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
-	withWS(ctx, limit, startTime, h.DBPeriod, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
+	withWS(ctx, createParams(ctx), h.DBPeriod, h.getEventsFuncs(false, false, strings.Split(ctx.Query("res"), ",")...)...)
 }
 
-func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFuncs []eventsFunc) {
-	var getMap map[string]eventsFunc
+func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFuncs []model.EventsFunc) {
+	var getMap map[string]model.EventsFunc
 	if ns {
-		getMap = map[string]eventsFunc{
+		getMap = map[string]model.EventsFunc{
 			"ns":         h.GetNamespaceChanges,
 			"deploy":     h.GetNamespaceDeploymentsChanges,
 			"svc":        h.GetNamespaceServicesChanges,
@@ -198,7 +190,7 @@ func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFu
 			"events-pvc": h.GetNamespacePVCsEvents,
 		}
 	} else {
-		getMap = map[string]eventsFunc{
+		getMap = map[string]model.EventsFunc{
 			"ns":         h.GetAllNamespacesChanges,
 			"deploy":     h.GetAllNamespacesDeploymentsChanges,
 			"svc":        h.GetAllNamespacesServicesChanges,
@@ -224,4 +216,26 @@ func (h *EventsHandlers) getEventsFuncs(all, ns bool, events ...string) (eventFu
 		}
 	}
 	return eventFuncs
+}
+
+func createParams(ctx *gin.Context) model.FuncParams {
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
+	isAdmin := httputil.MustGetUserRole(ctx.Request.Context()) == m.RoleAdmin
+
+	var namespaces []string
+	if !isAdmin {
+		nsList := ctx.MustGet(m.UserNamespaces).(*m.UserHeaderDataMap)
+		for _, n := range *nsList {
+			namespaces = append(namespaces, n.ID)
+		}
+	}
+
+	return model.FuncParams{
+		Params:         ctx.Params,
+		Limit:          limit,
+		StartTime:      startTime,
+		UserAdmin:      isAdmin,
+		UserNamespaces: namespaces,
+	}
 }

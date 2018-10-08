@@ -7,10 +7,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/containerum/events-api/pkg/model"
+
 	"github.com/ninedraft/gocontrol"
 
 	"github.com/containerum/events-api/pkg/util/ticker"
-	"github.com/containerum/kube-client/pkg/model"
+	kubeModel "github.com/containerum/kube-client/pkg/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -23,7 +25,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func withWS(ctx *gin.Context, limit int, startTime time.Time, dbPeriod time.Duration, getfuncs ...eventsFunc) {
+func withWS(ctx *gin.Context, params model.FuncParams, dbPeriod time.Duration, getfuncs ...model.EventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
@@ -35,8 +37,8 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, dbPeriod time.Dura
 	defer ctx.Abort()
 
 	var errChan = make(chan error)
-	var resultChan = make(chan model.Event)
-	var finalChan = make(chan []model.Event)
+	var resultChan = make(chan kubeModel.Event)
+	var finalChan = make(chan []kubeModel.Event)
 	defer close(resultChan)
 	defer close(errChan)
 	defer close(finalChan)
@@ -62,13 +64,12 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, dbPeriod time.Dura
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
 		go EventAggregator{
-			Ctx:         ctx,
-			Limit:       limit,
+			CTX:         ctx,
+			Params:      params,
 			EventSource: eventSource,
 			EventDrain:  resultChan,
 			ErrChan:     errChan,
 			Control:     control,
-			StartAt:     startTime,
 			DBPeriod:    dbPeriod,
 		}.Run()
 	}
@@ -104,8 +105,8 @@ func withWS(ctx *gin.Context, limit int, startTime time.Time, dbPeriod time.Dura
 						return timei.After(timej)
 					})
 					limitOnce.Do(func() {
-						if limit < len(result) && limit > 0 {
-							result = result[:limit]
+						if params.Limit < len(result) && params.Limit > 0 {
+							result = result[:params.Limit]
 						}
 					})
 
@@ -134,8 +135,8 @@ type EventBatcher struct {
 	Ctx               *gin.Context
 	ErrChan           chan error
 	Quant             time.Duration
-	EventSource       <-chan model.Event
-	BatchDrain        chan<- []model.Event
+	EventSource       <-chan kubeModel.Event
+	BatchDrain        chan<- []kubeModel.Event
 	Control           *gocontrol.Guard
 	PreallocBatchSize int
 }
@@ -148,7 +149,7 @@ func (batcher EventBatcher) Run() {
 	var finalChan = batcher.BatchDrain
 	var resultChan = batcher.EventSource
 
-	results := make([]model.Event, 0)
+	results := make([]kubeModel.Event, 0)
 	var timer = ticker.NewTicker(batcher.Quant)
 	timer.Start()
 	defer timer.Stop()
@@ -160,7 +161,7 @@ func (batcher EventBatcher) Run() {
 			return
 		case <-timer.Ticks():
 			finalChan <- results
-			results = make([]model.Event, 0)
+			results = make([]kubeModel.Event, 0)
 		case event, ok := <-resultChan:
 			if !ok {
 				return
@@ -171,11 +172,10 @@ func (batcher EventBatcher) Run() {
 }
 
 type EventAggregator struct {
-	Ctx         *gin.Context
-	StartAt     time.Time
-	Limit       int
-	EventSource eventsFunc
-	EventDrain  chan<- model.Event
+	CTX         *gin.Context
+	Params      model.FuncParams
+	EventSource model.EventsFunc
+	EventDrain  chan<- kubeModel.Event
 	ErrChan     chan<- error
 	Control     *gocontrol.Guard
 	DBPeriod    time.Duration
@@ -184,13 +184,11 @@ type EventAggregator struct {
 func (aggregate EventAggregator) Run() {
 	defer aggregate.Control.Go()()
 
-	var ctx = aggregate.Ctx
 	var getfunc = aggregate.EventSource
-	var funcLimit = aggregate.Limit
-	var startTime = aggregate.StartAt
 	var resultChan = aggregate.EventDrain
 	var errChan = aggregate.ErrChan
-	var aborted = AbortWaiter(aggregate.Ctx.IsAborted)
+	var params = aggregate.Params
+	var aborted = AbortWaiter(aggregate.CTX.IsAborted)
 	var firstEventSend = false
 	var dbPeriod = aggregate.DBPeriod
 
@@ -198,10 +196,10 @@ func (aggregate EventAggregator) Run() {
 		select {
 		case <-aborted: //If context aborted finish goroutine
 			return
-		case <-aggregate.Ctx.Done():
+		case <-aggregate.CTX.Done():
 			return
 		default:
-			resp, err := getfunc(ctx.Params, funcLimit, startTime)
+			resp, err := getfunc(params)
 			if err != nil {
 				errChan <- err
 				return
@@ -211,7 +209,7 @@ func (aggregate EventAggregator) Run() {
 				select {
 				case <-aborted: //If context aborted finish goroutine
 					return
-				case <-aggregate.Ctx.Done():
+				case <-aggregate.CTX.Done():
 					return
 				case resultChan <- event:
 					continue batchLoop
@@ -220,9 +218,9 @@ func (aggregate EventAggregator) Run() {
 			if !firstEventSend {
 				firstEventSend = true
 			}
-			funcLimit = 0
+			params.Limit = 0
 			//Get only new events
-			startTime = time.Now()
+			params.StartTime = time.Now()
 			time.Sleep(dbPeriod)
 		}
 	}
