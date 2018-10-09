@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
-	"runtime"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/containerum/events-api/pkg/util/atomicbool"
 
 	"github.com/containerum/events-api/pkg/model"
 
@@ -25,16 +27,18 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func withWS(ctx *gin.Context, params model.FuncParams, dbPeriod time.Duration, getfuncs ...model.EventsFunc) {
+func withWS(ginCtx *gin.Context, params model.FuncParams, dbPeriod time.Duration, getfuncs ...model.EventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
-	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	c, err := upgrader.Upgrade(ginCtx.Writer, ginCtx.Request, nil)
 	if err != nil {
 		log.Debug(err)
 		return
 	}
 	defer c.Close()
-	defer ctx.Abort()
+
+	ctx, cancelCTX := context.WithCancel(ginCtx.Request.Context())
+	defer cancelCTX()
 
 	var errChan = make(chan error)
 	var resultChan = make(chan kubeModel.Event)
@@ -42,6 +46,8 @@ func withWS(ctx *gin.Context, params model.FuncParams, dbPeriod time.Duration, g
 	defer close(resultChan)
 	defer close(errChan)
 	defer close(finalChan)
+
+	var firstTimeWG = &sync.WaitGroup{}
 
 	c.SetReadDeadline(time.Now().Add(10 * time.Second))
 	c.SetPongHandler(func(string) error {
@@ -63,25 +69,28 @@ func withWS(ctx *gin.Context, params model.FuncParams, dbPeriod time.Duration, g
 
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
+		firstTimeWG.Add(1)
 		go EventAggregator{
-			CTX:         ctx,
-			Params:      params,
-			EventSource: eventSource,
-			EventDrain:  resultChan,
-			ErrChan:     errChan,
-			Control:     control,
-			DBPeriod:    dbPeriod,
+			CTX:                ctx,
+			Params:             params,
+			EventSource:        eventSource,
+			EventDrain:         resultChan,
+			ErrChan:            errChan,
+			Control:            control,
+			DBPeriod:           dbPeriod,
+			FirstTimeWaitGroup: firstTimeWG,
 		}.Run()
 	}
 
 	go EventBatcher{
-		Ctx:               ctx,
-		ErrChan:           errChan,
-		Quant:             1 * time.Second,
-		BatchDrain:        finalChan,
-		PreallocBatchSize: 16,
-		EventSource:       resultChan,
-		Control:           control,
+		Ctx:                ctx,
+		ErrChan:            errChan,
+		Quant:              1 * time.Second,
+		BatchDrain:         finalChan,
+		PreallocBatchSize:  16,
+		EventSource:        resultChan,
+		Control:            control,
+		FirstTimeWaitGroup: firstTimeWG,
 	}.Run()
 
 	go func() {
@@ -132,22 +141,28 @@ func withWS(ctx *gin.Context, params model.FuncParams, dbPeriod time.Duration, g
 }
 
 type EventBatcher struct {
-	Ctx               *gin.Context
-	ErrChan           chan error
-	Quant             time.Duration
-	EventSource       <-chan kubeModel.Event
-	BatchDrain        chan<- []kubeModel.Event
-	Control           *gocontrol.Guard
-	PreallocBatchSize int
+	Ctx                context.Context
+	ErrChan            chan error
+	Quant              time.Duration
+	EventSource        <-chan kubeModel.Event
+	BatchDrain         chan<- []kubeModel.Event
+	Control            *gocontrol.Guard
+	PreallocBatchSize  int
+	FirstTimeWaitGroup *sync.WaitGroup
 }
 
 func (batcher EventBatcher) Run() {
 	defer batcher.Control.Go()()
 
 	var ctx = batcher.Ctx
-	var aborted = AbortWaiter(ctx.IsAborted)
 	var finalChan = batcher.BatchDrain
 	var resultChan = batcher.EventSource
+
+	ready, checkReady := atomicbool.Create()
+	go func() {
+		batcher.FirstTimeWaitGroup.Wait()
+		ready()
+	}()
 
 	results := make([]kubeModel.Event, 0)
 	var timer = ticker.NewTicker(batcher.Quant)
@@ -155,11 +170,13 @@ func (batcher EventBatcher) Run() {
 	defer timer.Stop()
 	for {
 		select {
-		case <-aborted:
-			return
 		case <-ctx.Done():
 			return
 		case <-timer.Ticks():
+			//Wait for first batch of events
+			if !checkReady() {
+				continue
+			}
 			finalChan <- results
 			results = make([]kubeModel.Event, 0)
 		case event, ok := <-resultChan:
@@ -172,13 +189,14 @@ func (batcher EventBatcher) Run() {
 }
 
 type EventAggregator struct {
-	CTX         *gin.Context
-	Params      model.FuncParams
-	EventSource model.EventsFunc
-	EventDrain  chan<- kubeModel.Event
-	ErrChan     chan<- error
-	Control     *gocontrol.Guard
-	DBPeriod    time.Duration
+	CTX                context.Context
+	Params             model.FuncParams
+	EventSource        model.EventsFunc
+	EventDrain         chan<- kubeModel.Event
+	ErrChan            chan<- error
+	Control            *gocontrol.Guard
+	DBPeriod           time.Duration
+	FirstTimeWaitGroup *sync.WaitGroup
 }
 
 func (aggregate EventAggregator) Run() {
@@ -188,18 +206,19 @@ func (aggregate EventAggregator) Run() {
 	var resultChan = aggregate.EventDrain
 	var errChan = aggregate.ErrChan
 	var params = aggregate.Params
-	var aborted = AbortWaiter(aggregate.CTX.IsAborted)
-	var firstEventSend = false
 	var dbPeriod = aggregate.DBPeriod
+	var firstTimeReadyOnce = sync.Once{}
 
 	for {
 		select {
-		case <-aborted: //If context aborted finish goroutine
-			return
 		case <-aggregate.CTX.Done():
 			return
 		default:
 			resp, err := getfunc(params)
+			//Indicate that we got first batch from DB
+			firstTimeReadyOnce.Do(func() {
+				aggregate.FirstTimeWaitGroup.Done()
+			})
 			if err != nil {
 				errChan <- err
 				return
@@ -207,16 +226,11 @@ func (aggregate EventAggregator) Run() {
 		batchLoop:
 			for _, event := range resp.Events {
 				select {
-				case <-aborted: //If context aborted finish goroutine
-					return
 				case <-aggregate.CTX.Done():
 					return
 				case resultChan <- event:
 					continue batchLoop
 				}
-			}
-			if !firstEventSend {
-				firstEventSend = true
 			}
 			params.Limit = 0
 			//Get only new events
@@ -224,19 +238,4 @@ func (aggregate EventAggregator) Run() {
 			time.Sleep(dbPeriod)
 		}
 	}
-}
-
-func AbortWaiter(aborted func() bool) <-chan struct{} {
-	var wait = make(chan struct{})
-	go func() {
-		defer close(wait)
-		for {
-			if aborted() {
-				return
-			}
-			runtime.Gosched()
-			time.Sleep(100 * time.Millisecond)
-		}
-	}()
-	return wait
 }
