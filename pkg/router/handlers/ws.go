@@ -5,13 +5,12 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ninedraft/gocontrol"
-
+	"github.com/containerum/events-api/pkg/eventfilter"
 	"github.com/containerum/events-api/pkg/util/ticker"
 	"github.com/containerum/kube-client/pkg/model"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/ninedraft/gocontrol"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,6 +23,20 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	//Divide limit to all functions
 	limit = limit / len(getfuncs)
 
+	var filter eventfilter.Predicate = eventfilter.True
+	var userDefinedLevelWhiteList = ctx.QueryArray("levels")
+	if len(userDefinedLevelWhiteList) > 0 {
+		var levelWhiteList = func() []model.EventKind {
+			var levels = ctx.QueryArray("levels")
+			var kinds = make([]model.EventKind, 0, len(levels))
+			for _, level := range levels {
+				kinds = append(kinds, model.EventKind(level))
+			}
+			return kinds
+		}()
+		filter = eventfilter.MatchAnyKind(levelWhiteList...)
+	}
+
 	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		logrus.Debug(err)
@@ -33,11 +46,9 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	defer ctx.Abort()
 
 	var errChan = make(chan error)
-	var resultChan = make(chan model.Event)
-	var finalChan = make(chan []model.Event)
-	defer close(resultChan)
+	var unfilteredEvents = make(chan model.Event)
+	defer close(unfilteredEvents)
 	defer close(errChan)
-	defer close(finalChan)
 
 	c.SetReadDeadline(time.Now().Add(10 * time.Second))
 	c.SetPongHandler(func(string) error {
@@ -46,16 +57,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	})
 
 	//Checking for closed connection
-	go func() {
-		defer control.Go()()
-		for {
-			_, _, err := c.ReadMessage()
-			if err != nil {
-				errChan <- err
-				return
-			}
-		}
-	}()
+	go CheckConnection(control, c, errChan)
 
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
@@ -63,19 +65,21 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 			Ctx:         ctx,
 			Limit:       limit,
 			EventSource: eventSource,
-			EventDrain:  resultChan,
+			EventDrain:  unfilteredEvents,
 			ErrChan:     errChan,
 			Control:     control,
 		}.Run()
 	}
 
+	var filteredEvents = filter.Pipe(-1, unfilteredEvents)
+	var eventBatches = make(chan []model.Event)
 	go EventBatcher{
 		Ctx:               ctx,
 		ErrChan:           errChan,
 		Quant:             1 * time.Second,
-		BatchDrain:        finalChan,
+		BatchDrain:        eventBatches,
 		PreallocBatchSize: 16,
-		EventSource:       resultChan,
+		EventSource:       filteredEvents,
 		Сontrol:           control,
 	}.Run()
 
@@ -87,7 +91,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 		defer pingTicker.Stop()
 		for {
 			select {
-			case result, ok := <-finalChan:
+			case result, ok := <-eventBatches:
 				if !ok {
 					return
 				}
@@ -227,4 +231,15 @@ func AbortWaiter(aborted func() bool) <-chan struct{} {
 		}
 	}()
 	return wait
+}
+
+func CheckConnection(control *gocontrol.Guard, conn *websocket.Conn, errChan chan<- error) {
+	defer control.Go()()
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			errChan <- err
+			return
+		}
+	}
 }
