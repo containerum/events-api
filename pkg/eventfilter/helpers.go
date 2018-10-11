@@ -2,6 +2,14 @@ package eventfilter
 
 import "github.com/containerum/kube-client/pkg/model"
 
+func True(model.Event) bool {
+	return true
+}
+
+func False(model.Event) bool {
+	return false
+}
+
 func EqKind(kind model.EventKind) Predicate {
 	return func(event model.Event) bool { return event.Kind == kind }
 }
