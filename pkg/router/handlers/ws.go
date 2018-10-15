@@ -37,12 +37,12 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 		filter = eventfilter.MatchAnyKind(levelWhiteList...)
 	}
 
-	c, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		logrus.Debug(err)
 		return
 	}
-	defer c.Close()
+	defer conn.Close()
 	defer ctx.Abort()
 
 	var errChan = make(chan error)
@@ -50,14 +50,14 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	defer close(unfilteredEvents)
 	defer close(errChan)
 
-	c.SetReadDeadline(time.Now().Add(10 * time.Second))
-	c.SetPongHandler(func(string) error {
-		c.SetReadDeadline(time.Now().Add(10 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		return nil
 	})
 
 	//Checking for closed connection
-	go CheckConnection(control, c, errChan)
+	go CheckConnection(control, conn, errChan)
 
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
@@ -102,12 +102,12 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 						return timei.Before(timej)
 					})
 					logrus.Infof("Writing %v events", len(result))
-					if err := c.WriteJSON(result); err != nil {
+					if err := conn.WriteJSON(result); err != nil {
 						errChan <- err
 					}
 				}
 			case <-pingTicker.Ticks():
-				if err := c.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+				if err := conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 					return
 				}
 			}
