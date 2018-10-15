@@ -12,30 +12,93 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *EventsHandlers) GetPodEventsListHandler(ctx *gin.Context) {
-	handleResourceChangesEvents(h, ctx, h.GetPodEvents)
-}
-
-func (h *EventsHandlers) GetNamespacePodsEventsListHandler(ctx *gin.Context) {
-	handleResourceChangesEvents(h, ctx, h.GetNamespacePodsEvents)
-}
-
-func (h *EventsHandlers) GetPVCEventsListHandler(ctx *gin.Context) {
-	handleResourceChangesEvents(h, ctx, h.GetPVCEvents)
-}
-
-func (h *EventsHandlers) GetNamespacePVCsEventsListHandler(ctx *gin.Context) {
-	handleResourceChangesEvents(h, ctx, h.GetNamespacePVCsEvents)
-}
-
+// swagger:operation GET /events/containerum/users Events GetUsersEventsList
+// Get users events.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '200':
+//    description: events list
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) GetUsersEventsListHandler(ctx *gin.Context) {
 	handleResourceChangesEvents(h, ctx, h.GetUsersEvents)
 }
 
+// swagger:operation GET /events/containerum/system Events GetSystemEventsList
+// Get system events.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '200':
+//    description: events list
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) GetSystemEventsListHandler(ctx *gin.Context) {
 	handleResourceChangesEvents(h, ctx, h.GetSystemEvents)
 }
 
+// swagger:operation POST /events/containerum/users Events AddUserEvent
+// Add user event.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: body
+//    in: body
+//    schema:
+//      $ref: '#/definitions/Event'
+// responses:
+//  '202':
+//    description: event added
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) AddUserEventHandler(ctx *gin.Context) {
 	var event model.Event
 	if err := ctx.ShouldBindWith(&event, binding.JSON); err != nil {
@@ -51,6 +114,23 @@ func (h *EventsHandlers) AddUserEventHandler(ctx *gin.Context) {
 	ctx.Status(http.StatusAccepted)
 }
 
+// swagger:operation POST /events/containerum/system Events AddSystemEvent
+// Add system event.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: body
+//    in: body
+//    schema:
+//      $ref: '#/definitions/Event'
+// responses:
+//  '202':
+//    description: event added
+//  default:
+//    $ref: '#/responses/error'
 func (h *EventsHandlers) AddSystemEventHandler(ctx *gin.Context) {
 	var event model.Event
 	if err := ctx.ShouldBindWith(&event, binding.JSON); err != nil {
@@ -64,4 +144,39 @@ func (h *EventsHandlers) AddSystemEventHandler(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusAccepted)
+}
+
+// swagger:operation GET /events/nodes Events GetNodesEventsLis
+// Get nodes events.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: ws
+//    in: query
+//    type: string
+//    required: false
+//  - name: limit
+//    in: query
+//    type: string
+//    required: false
+//  - name: time
+//    in: query
+//    type: string
+//    required: false
+// responses:
+//  '200':
+//    description: events list
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  '101':
+//    description: websocket response
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
+func (h *EventsHandlers) GetNodesEventsListHandler(ctx *gin.Context) {
+	handleResourceChangesEvents(h, ctx, h.GetAllNodesEvents)
 }

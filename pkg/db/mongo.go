@@ -7,7 +7,7 @@ import (
 	"errors"
 
 	"github.com/globalsign/mgo"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 )
 
 type MongoStorage struct {
-	logger logrus.FieldLogger
+	logger log.FieldLogger
 	config MongoConfig
 	closed bool
 	db     *mgo.Database
@@ -48,9 +48,9 @@ func (mongo *MongoStorage) IsClosed() bool {
 
 func NewMongo(config MongoConfig) (*MongoStorage, error) {
 	if config.Logger == nil {
-		var logger = logrus.StandardLogger()
+		var logger = log.StandardLogger()
 		if config.Debug {
-			logger.SetLevel(logrus.DebugLevel)
+			logger.SetLevel(log.DebugLevel)
 		}
 		config.Logger = logger
 	}

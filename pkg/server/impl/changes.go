@@ -1,146 +1,296 @@
 package impl
 
 import (
-	"time"
+	"github.com/containerum/events-api/pkg/model"
 
 	"github.com/containerum/kube-events/pkg/storage/mongodb"
 
-	"github.com/containerum/kube-client/pkg/model"
-	"github.com/gin-gonic/gin"
+	kubeModel "github.com/containerum/kube-client/pkg/model"
 )
 
-func (ea *EventsActionsImpl) GetNamespaceChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespaceChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting namespace changes")
-	changes, err := ea.mongo.GetNamespaceChangesList(ns, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetNamespacesChangesList(params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetDeploymentChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	deploy := params.ByName("deployment")
+func (ea *EventsActionsImpl) GetAllNamespacesChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting all namespaces changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllNamespacesChangesList(params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetNamespacesChangesList(params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetDeploymentChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	deploy := params.Params.ByName("deployment")
+
 	ea.log.WithField("namespace", ns).WithField("deployment", deploy).Debugln("Getting deployment changes")
-	changes, err := ea.mongo.GetChangesList(ns, deploy, mongodb.DeploymentCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesList(ns, deploy, mongodb.DeploymentCollection, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespaceDeploymentsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespaceDeploymentsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting deployments changes")
-	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.DeploymentCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesInNamespacesList(mongodb.DeploymentCollection, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetServiceChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	svc := params.ByName("service")
+func (ea *EventsActionsImpl) GetAllNamespacesDeploymentsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting deployments changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllChangesList(mongodb.DeploymentCollection, params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetChangesInNamespacesList(mongodb.DeploymentCollection, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetServiceChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	svc := params.Params.ByName("service")
+
 	ea.log.WithField("namespace", ns).WithField("service", svc).Debugln("Getting service changes")
-	changes, err := ea.mongo.GetChangesList(ns, svc, mongodb.ServiceCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesList(ns, svc, mongodb.ServiceCollection, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespaceServicesChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespaceServicesChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting services changes")
-	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.ServiceCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesInNamespacesList(mongodb.ServiceCollection, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetIngressChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	ingr := params.ByName("ingress")
+func (ea *EventsActionsImpl) GetAllNamespacesServicesChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting services changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllChangesList(mongodb.ServiceCollection, params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetChangesInNamespacesList(mongodb.ServiceCollection, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetIngressChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	ingr := params.Params.ByName("ingress")
+
 	ea.log.WithField("namespace", ns).WithField("ingress", ingr).Debugln("Getting ingress changes")
-	changes, err := ea.mongo.GetChangesList(ns, ingr, mongodb.IngressCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesList(ns, ingr, mongodb.IngressCollection, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespaceIngressesChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespaceIngressesChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting ingresses changes")
-	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.IngressCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesInNamespacesList(mongodb.IngressCollection, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetPVCChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	pvc := params.ByName("pvc")
+func (ea *EventsActionsImpl) GetAllNamespacesIngressesChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting ingresses changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllChangesList(mongodb.IngressCollection, params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetChangesInNamespacesList(mongodb.IngressCollection, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetPVCChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	pvc := params.Params.ByName("pvc")
+
 	ea.log.WithField("namespace", ns).WithField("pvc", pvc).Debugln("Getting PVC changes")
-	changes, err := ea.mongo.GetChangesList(ns, pvc, mongodb.PVCCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesList(ns, pvc, mongodb.PVCCollection, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespacePVCsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespacePVCsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting PVCs changes")
-	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.PVCCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesInNamespacesList(mongodb.PVCCollection, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetSecretChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	secret := params.ByName("pvc")
+func (ea *EventsActionsImpl) GetAllNamespacesPVCsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting PVCs changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllChangesList(mongodb.PVCCollection, params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetChangesInNamespacesList(mongodb.PVCCollection, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetSecretChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	secret := params.Params.ByName("pvc")
+
 	ea.log.WithField("namespace", ns).WithField("secret", secret).Debugln("Getting secret changes")
-	changes, err := ea.mongo.GetChangesList(ns, secret, mongodb.SecretsCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesList(ns, secret, mongodb.SecretsCollection, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespaceSecretsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespaceSecretsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting secrets changes")
-	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.SecretsCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesInNamespacesList(mongodb.SecretsCollection, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetConfigMapChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
-	cm := params.ByName("configmap")
+func (ea *EventsActionsImpl) GetAllNamespacesSecretsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting secrets changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllChangesList(mongodb.SecretsCollection, params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetChangesInNamespacesList(mongodb.SecretsCollection, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetConfigMapChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+	cm := params.Params.ByName("configmap")
+
 	ea.log.WithField("namespace", ns).WithField("configmap", cm).Debugln("Getting configmap changes")
-	changes, err := ea.mongo.GetChangesList(ns, cm, mongodb.ConfigMapsCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesList(ns, cm, mongodb.ConfigMapsCollection, params.Limit, params.StartTime)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
 }
 
-func (ea *EventsActionsImpl) GetNamespaceConfigMapsChanges(params gin.Params, limit int, startTime time.Time) (*model.EventsList, error) {
-	ns := params.ByName("namespace")
+func (ea *EventsActionsImpl) GetNamespaceConfigMapsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ns := params.Params.ByName("namespace")
+
 	ea.log.WithField("namespace", ns).Debugln("Getting configmaps changes")
-	changes, err := ea.mongo.GetChangesInNamespaceList(ns, mongodb.ConfigMapsCollection, limit, startTime)
+	ns = checkNamespacePermissions(params.UserAdmin, ns, params.UserNamespaces)
+
+	changes, err := ea.mongo.GetChangesInNamespacesList(mongodb.ConfigMapsCollection, params.Limit, params.StartTime, ns)
 	if err != nil {
 		return nil, err
 	}
-	return &model.EventsList{Events: changes}, nil
+	return &kubeModel.EventsList{Events: changes}, nil
+}
+
+func (ea *EventsActionsImpl) GetAllNamespacesConfigMapsChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
+	ea.log.Debugln("Getting configmaps changes")
+
+	var changes []kubeModel.Event
+	var err error
+	if params.UserAdmin {
+		changes, err = ea.mongo.GetAllChangesList(mongodb.ConfigMapsCollection, params.Limit, params.StartTime)
+	} else {
+		changes, err = ea.mongo.GetChangesInNamespacesList(mongodb.ConfigMapsCollection, params.Limit, params.StartTime, params.UserNamespaces...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &kubeModel.EventsList{Events: changes}, nil
 }

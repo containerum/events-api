@@ -33,22 +33,22 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
 
-            {{- if .Values.env.local.CH_EVENTS_API_MONGO_ADDR }}
-            - name: CH_EVENTS_API_MONGO_ADDR
-              value: "{{ .Values.env.local.CH_EVENTS_API_MONGO_ADDR }}"
+            {{- if .Values.env.local.MONGO_ADDR }}
+            - name: MONGO_ADDR
+              value: "{{ .Values.env.local.MONGO_ADDR }}"
             {{- else }}
-            - name: CH_EVENTS_API_MONGO_ADDR
+            - name: MONGO_ADDR
               value: "{{ .Release.Name }}-mongodb:27017"
             {{- end }}
 
-            {{- if .Values.env.local.CH_EVENTS_API_MONGO_PASSWORD }}
-            - name: CH_EVENTS_API_MONGO_PASSWORD
+            {{- if .Values.env.local.MONGO_PASSWORD }}
+            - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ template "fullname" . }}
                   key: mongodb-password
             {{- else if .Values.tags.platformdb }}
-            - name: CH_EVENTS_API_MONGO_PASSWORD
+            - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-mongodb

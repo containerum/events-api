@@ -5,18 +5,23 @@ import (
 	"sort"
 	"time"
 
-	"github.com/containerum/events-api/pkg/eventfilter"
+	"github.com/ninedraft/gocontrol"
+
 	"github.com/containerum/events-api/pkg/util/ticker"
 	"github.com/containerum/kube-client/pkg/model"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/ninedraft/gocontrol"
 	"github.com/sirupsen/logrus"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
-func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
+func withWS(ginCtx *gin.Context, params model.FuncParams, dbPeriod time.Duration, getfuncs ...model.EventsFunc) {
 	var control = &gocontrol.Guard{}
 	defer control.Wait()
 
@@ -86,6 +91,8 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 	go func() {
 		defer control.Go()()
 
+		var limitOnce = sync.Once{}
+
 		pingTicker := ticker.NewTicker(1 * time.Second)
 		pingTicker.Start()
 		defer pingTicker.Stop()
@@ -99,7 +106,7 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 					sort.Slice(result, func(i, j int) bool {
 						timei, _ := time.Parse(time.RFC3339, result[i].Time)
 						timej, _ := time.Parse(time.RFC3339, result[j].Time)
-						return timei.Before(timej)
+						return timei.After(timej)
 					})
 					logrus.Infof("Writing %v events", len(result))
 					if err := conn.WriteJSON(result); err != nil {
@@ -123,36 +130,44 @@ func withWS(ctx *gin.Context, limit int, getfuncs ...eventsFunc) {
 }
 
 type EventBatcher struct {
-	Ctx               *gin.Context
-	ErrChan           chan error
-	Quant             time.Duration
-	EventSource       <-chan model.Event
-	BatchDrain        chan<- []model.Event
-	Сontrol           *gocontrol.Guard
-	PreallocBatchSize int
+	Ctx                context.Context
+	ErrChan            chan error
+	Quant              time.Duration
+	EventSource        <-chan kubeModel.Event
+	BatchDrain         chan<- []kubeModel.Event
+	Control            *gocontrol.Guard
+	PreallocBatchSize  int
+	FirstTimeWaitGroup *sync.WaitGroup
 }
 
 func (batcher EventBatcher) Run() {
-	defer batcher.Сontrol.Go()()
+	defer batcher.Control.Go()()
 
 	var ctx = batcher.Ctx
-	var aborted = AbortWaiter(ctx.IsAborted)
 	var finalChan = batcher.BatchDrain
 	var resultChan = batcher.EventSource
 
-	results := make([]model.Event, 0)
+	ready, checkReady := atomicbool.Create()
+	go func() {
+		batcher.FirstTimeWaitGroup.Wait()
+		ready()
+	}()
+
+	results := make([]kubeModel.Event, 0)
 	var timer = ticker.NewTicker(batcher.Quant)
 	timer.Start()
 	defer timer.Stop()
 	for {
 		select {
-		case <-aborted:
-			return
 		case <-ctx.Done():
 			return
 		case <-timer.Ticks():
+			//Wait for first batch of events
+			if !checkReady() {
+				continue
+			}
 			finalChan <- results
-			results = make([]model.Event, 0)
+			results = make([]kubeModel.Event, 0)
 		case event, ok := <-resultChan:
 			if !ok {
 				return
@@ -162,36 +177,37 @@ func (batcher EventBatcher) Run() {
 	}
 }
 
-type EventAgregator struct {
-	Ctx         *gin.Context
-	StartAt     time.Time
-	Limit       int
-	EventSource eventsFunc
-	EventDrain  chan<- model.Event
-	ErrChan     chan<- error
-	Control     *gocontrol.Guard
+type EventAggregator struct {
+	CTX                context.Context
+	Params             model.FuncParams
+	EventSource        model.EventsFunc
+	EventDrain         chan<- kubeModel.Event
+	ErrChan            chan<- error
+	Control            *gocontrol.Guard
+	DBPeriod           time.Duration
+	FirstTimeWaitGroup *sync.WaitGroup
 }
 
-func (agregate EventAgregator) Run() {
-	defer agregate.Control.Go()()
+func (aggregate EventAggregator) Run() {
+	defer aggregate.Control.Go()()
 
-	var ctx = agregate.Ctx
-	var getfunc = agregate.EventSource
-	var funcLimit = agregate.Limit
-	var startTime = agregate.StartAt
-	var resultChan = agregate.EventDrain
-	var errChan = agregate.ErrChan
-	var aborted = AbortWaiter(agregate.Ctx.IsAborted)
-	var firstEventSend = false
+	var getfunc = aggregate.EventSource
+	var resultChan = aggregate.EventDrain
+	var errChan = aggregate.ErrChan
+	var params = aggregate.Params
+	var dbPeriod = aggregate.DBPeriod
+	var firstTimeReadyOnce = sync.Once{}
 
 	for {
 		select {
-		case <-aborted: //If context aborted finish goroutine
-			return
-		case <-agregate.Ctx.Done():
+		case <-aggregate.CTX.Done():
 			return
 		default:
-			resp, err := getfunc(ctx.Params, funcLimit, startTime)
+			resp, err := getfunc(params)
+			//Indicate that we got first batch from DB
+			firstTimeReadyOnce.Do(func() {
+				aggregate.FirstTimeWaitGroup.Done()
+			})
 			if err != nil {
 				errChan <- err
 				return
@@ -199,21 +215,16 @@ func (agregate EventAgregator) Run() {
 		batchLoop:
 			for _, event := range resp.Events {
 				select {
-				case <-aborted: //If context aborted finish goroutine
-					return
-				case <-agregate.Ctx.Done():
+				case <-aggregate.CTX.Done():
 					return
 				case resultChan <- event:
 					continue batchLoop
 				}
 			}
-			if !firstEventSend {
-				firstEventSend = true
-			}
-			funcLimit = 0
+			params.Limit = 0
 			//Get only new events
-			startTime = time.Now()
-			time.Sleep(60 * time.Second)
+			params.StartTime = time.Now()
+			time.Sleep(dbPeriod)
 		}
 	}
 }

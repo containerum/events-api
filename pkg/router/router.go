@@ -22,20 +22,20 @@ import (
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
-func CreateRouter(mongo *db.MongoStorage, status *model.ServiceStatus, tv *m.TranslateValidate, enableCORS bool) http.Handler {
+func CreateRouter(mongo *db.MongoStorage, status *model.ServiceStatus, tv *m.TranslateValidate, dbPeriod time.Duration, enableCORS bool) http.Handler {
 	e := gin.New()
 	systemHandlersSetup(e, status, enableCORS)
 	initMiddlewares(e, tv)
-	eventsHandlersSetup(e, tv, impl.NewEventsActionsImpl(mongo))
+	eventsHandlersSetup(e, tv, impl.NewEventsActionsImpl(mongo), dbPeriod)
 
 	return e
 }
 
 func initMiddlewares(e gin.IRouter, tv *m.TranslateValidate) {
-	e.Use(ginrus.Ginrus(logrus.StandardLogger(), time.RFC3339, true))
+	e.Use(ginrus.Ginrus(log.StandardLogger(), time.RFC3339, true))
 	binding.Validator = &validation.GinValidatorV9{Validate: tv.Validate} // gin has no local validator
 	e.Use(httputil.SaveHeaders)
 	e.Use(httputil.PrepareContext)
@@ -58,20 +58,26 @@ func systemHandlersSetup(router gin.IRouter, status *model.ServiceStatus, enable
 	}
 	router.Group("/static").
 		StaticFS("/", static.HTTP)
-	router.Use(gonic.Recovery(eaerrors.ErrInternal, cherrylog.NewLogrusAdapter(logrus.WithField("component", "gin_recovery"))))
+	router.Use(gonic.Recovery(eaerrors.ErrInternal, cherrylog.NewLogrusAdapter(log.WithField("component", "gin_recovery"))))
 
 	router.GET("/status", httputil.ServiceStatus(status))
 }
 
-func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions) {
-	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv}
+func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend server.EventsActions, dbPeriod time.Duration) {
+	eventsHandlers := h.EventsHandlers{EventsActions: backend, TranslateValidate: tv, DBPeriod: dbPeriod}
 
-	allEvents := router.Group("/namespaces/:namespace")
+	mainGroup := router.Group("/events")
 	{
-		allEvents.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)
-		allEvents.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler)
-	}
+		mainGroup.GET("/all", eventsHandlers.AllResourcesChangesEventsHandler)           //Websockets only
+		mainGroup.GET("/selected", eventsHandlers.SelectedResourcesChangesEventsHandler) //Websockets only
+		mainGroup.GET("/nodes", eventsHandlers.GetNodesEventsListHandler)                //Websockets only
 
+		allEvents := mainGroup.Group("/namespaces/:namespace")
+		{
+			allEvents.GET("/all", eventsHandlers.AllNamespaceResourcesChangesEventsHandler)           //Websockets only
+			allEvents.GET("/selected", eventsHandlers.SelectedNamespaceResourcesChangesEventsHandler) //Websockets only
+		}
+	}
 	containerumEvents := router.Group("/events/containerum")
 	{
 		containerumEvents.POST("/users", eventsHandlers.AddUserEventHandler)
@@ -79,35 +85,5 @@ func eventsHandlersSetup(router gin.IRouter, tv *m.TranslateValidate, backend se
 
 		containerumEvents.POST("/system", eventsHandlers.AddSystemEventHandler)
 		containerumEvents.GET("/system", eventsHandlers.GetSystemEventsListHandler)
-	}
-	events := router.Group("/events/namespaces/:namespace")
-	{
-		events.GET("/pods/:pod", eventsHandlers.GetPodEventsListHandler)
-		events.GET("/pods", eventsHandlers.GetNamespacePodsEventsListHandler)
-
-		events.GET("/pvc/:pvc", eventsHandlers.GetPVCEventsListHandler)
-		events.GET("/pvc", eventsHandlers.GetNamespacePVCsEventsListHandler)
-	}
-	changes := router.Group("/changes/namespaces/:namespace")
-	{
-		changes.GET("", eventsHandlers.GetNamespaceChangesListHandler)
-
-		changes.GET("/deployments/:deployment", eventsHandlers.GetDeploymentChangesListHandler)
-		changes.GET("/deployments", eventsHandlers.GetNamespaceDeploymentsChangesListHandler)
-
-		changes.GET("/services/:service", eventsHandlers.GetServiceChangesListHandler)
-		changes.GET("/services", eventsHandlers.GetNamespaceServicesChangesListHandler)
-
-		changes.GET("/ingresses/:ingress", eventsHandlers.GetIngressChangesListHandler)
-		changes.GET("/ingresses", eventsHandlers.GetNamespaceIngressesChangesListHandler)
-
-		changes.GET("/pvc/:pvc", eventsHandlers.GetPVCChangesListHandler)
-		changes.GET("/pvc", eventsHandlers.GetNamespacePVCsChangesListHandler)
-
-		changes.GET("/secrets/:secret", eventsHandlers.GetSecretChangesListHandler)
-		changes.GET("/secrets", eventsHandlers.GetNamespaceSecretsChangesListHandler)
-
-		changes.GET("/configmaps/:configmap", eventsHandlers.GetConfigMapChangesListHandler)
-		changes.GET("/configmaps", eventsHandlers.GetNamespaceConfigMapsChangesListHandler)
 	}
 }

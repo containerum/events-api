@@ -24,17 +24,34 @@ func (mongo *MongoStorage) GetChangesList(namespace, resource, collectionName st
 	return result, nil
 }
 
-func (mongo *MongoStorage) GetChangesInNamespaceList(namespace, collectionName string, limit int, startTime time.Time) ([]model.Event, error) {
+func (mongo *MongoStorage) GetChangesInNamespacesList(collectionName string, limit int, startTime time.Time, namespaces ...string) ([]model.Event, error) {
 	mongo.logger.WithField("collection", collectionName).Debugf("getting changes in namespace")
 	var collection = mongo.db.C(collectionName)
 	result := make([]model.Event, 0)
 	if err := collection.Find(bson.M{
-		"resourcenamespace": namespace,
+		"resourcenamespace": bson.M{
+			"$in": namespaces,
+		},
 		"dateadded": bson.M{
 			"$gte": startTime,
 		},
 	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get changes in namespace")
+		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
+	}
+	return result, nil
+}
+
+func (mongo *MongoStorage) GetAllChangesList(collectionName string, limit int, startTime time.Time) ([]model.Event, error) {
+	mongo.logger.WithField("collection", collectionName).Debugf("getting changes in all namespaces")
+	var collection = mongo.db.C(collectionName)
+	result := make([]model.Event, 0)
+	if err := collection.Find(bson.M{
+		"dateadded": bson.M{
+			"$gte": startTime,
+		},
+	}).Sort("-eventtime").Limit(limit).All(&result); err != nil {
+		mongo.logger.WithError(err).Errorf("unable to get changes in all namespaces")
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
 	return result, nil

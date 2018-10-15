@@ -17,11 +17,11 @@ service:
 
 env:
   global:
-    CH_EVENTS_API_MONGO_LOGIN: "events_user"
-    CH_EVENTS_API_MONGO_DB: "events"
+    MONGO_LOGIN: "events_user"
+    MONGO_DB: "events"
   local:
-    CH_EVENTS_API_MONGO_ADDR: "mongo-mongodb.mongo.svc.cluster.local:27017"
-    CH_EVENTS_API_MONGO_PASSWORD:
+    MONGO_ADDR: "mongo-mongodb.mongo.svc.cluster.local:27017"
+    MONGO_PASSWORD:
 
 mongodb:
   persistence:

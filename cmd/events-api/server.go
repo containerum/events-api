@@ -16,21 +16,21 @@ import (
 	m "github.com/containerum/events-api/pkg/router/middleware"
 	"github.com/containerum/events-api/pkg/util/validation"
 	"github.com/containerum/kube-client/pkg/model"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
 func initServer(c *cli.Context) error {
 	setupLogs(c)
 
-	logrus.Infof("Starting %v %v", c.App.Name, c.App.Version)
+	log.Infof("Starting %v %v", c.App.Name, c.App.Version)
 
-	w := tabwriter.NewWriter(logrus.StandardLogger().Writer(), 0, 0, 2, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	w := tabwriter.NewWriter(log.StandardLogger().Writer(), 0, 0, 2, ' ', tabwriter.TabIndent|tabwriter.Debug)
 	for _, f := range c.GlobalFlagNames() {
 		fmt.Fprintf(w, "Flag: %s\t Value: %s\n", f, c.String(f))
 	}
 	if err := w.Flush(); err != nil {
-		logrus.Debug(err)
+		log.Debug(err)
 	}
 
 	translate := setupTranslator()
@@ -48,7 +48,7 @@ func initServer(c *cli.Context) error {
 		StatusOK: true,
 	}
 
-	app := router.CreateRouter(mongo, &status, tv, c.Bool("cors"))
+	app := router.CreateRouter(mongo, &status, tv, c.Duration("db_request_period"), c.Bool("cors"))
 
 	srv := &http.Server{
 		Addr:    ":" + c.String("port"),
@@ -63,7 +63,7 @@ func initServer(c *cli.Context) error {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt) // subscribe on interrupt event
 	<-quit                            // wait for event
-	logrus.Infoln("shutting down server...")
+	log.Infoln("shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -72,7 +72,7 @@ func initServer(c *cli.Context) error {
 
 func exitOnError(err error) {
 	if err != nil {
-		logrus.WithError(err).Fatalf("can`t setup events-api")
+		log.WithError(err).Fatalf("can`t setup events-api")
 		os.Exit(1)
 	}
 }
