@@ -1,17 +1,21 @@
 package handlers
 
 import (
+	"context"
+	"net/http"
 	"runtime"
 	"sort"
+	"sync"
 	"time"
 
-	"github.com/ninedraft/gocontrol"
-
+	"github.com/containerum/events-api/pkg/eventfilter"
+	"github.com/containerum/events-api/pkg/model"
+	"github.com/containerum/events-api/pkg/util/atomicbool"
 	"github.com/containerum/events-api/pkg/util/ticker"
-	"github.com/containerum/kube-client/pkg/model"
-
+	kubemodel "github.com/containerum/kube-client/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/ninedraft/gocontrol"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,32 +30,29 @@ func withWS(ginCtx *gin.Context, params model.FuncParams, dbPeriod time.Duration
 	defer control.Wait()
 
 	//Divide limit to all functions
-	limit = limit / len(getfuncs)
 
 	var filter eventfilter.Predicate = eventfilter.True
-	var userDefinedLevelWhiteList = ctx.QueryArray("levels")
+	var userDefinedLevelWhiteList = ginCtx.QueryArray("levels")
 	if len(userDefinedLevelWhiteList) > 0 {
-		var levelWhiteList = func() []model.EventKind {
-			var levels = ctx.QueryArray("levels")
-			var kinds = make([]model.EventKind, 0, len(levels))
+		var levelWhiteList = func() []kubemodel.EventKind {
+			var levels = ginCtx.QueryArray("levels")
+			var kinds = make([]kubemodel.EventKind, 0, len(levels))
 			for _, level := range levels {
-				kinds = append(kinds, model.EventKind(level))
+				kinds = append(kinds, kubemodel.EventKind(level))
 			}
 			return kinds
 		}()
 		filter = eventfilter.MatchAnyKind(levelWhiteList...)
 	}
 
-	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	conn, err := upgrader.Upgrade(ginCtx.Writer, ginCtx.Request, nil)
 	if err != nil {
 		logrus.Debug(err)
 		return
 	}
 	defer conn.Close()
-	defer ctx.Abort()
-
 	var errChan = make(chan error)
-	var unfilteredEvents = make(chan model.Event)
+	var unfilteredEvents = make(chan kubemodel.Event)
 	defer close(unfilteredEvents)
 	defer close(errChan)
 
@@ -66,9 +67,8 @@ func withWS(ginCtx *gin.Context, params model.FuncParams, dbPeriod time.Duration
 
 	//Limiter. Waiting for all DB request to finish on first run.
 	for _, eventSource := range getfuncs {
-		go EventAgregator{
-			Ctx:         ctx,
-			Limit:       limit,
+		go EventAggregator{
+			CTX:         ginCtx,
 			EventSource: eventSource,
 			EventDrain:  unfilteredEvents,
 			ErrChan:     errChan,
@@ -77,21 +77,18 @@ func withWS(ginCtx *gin.Context, params model.FuncParams, dbPeriod time.Duration
 	}
 
 	var filteredEvents = filter.Pipe(-1, unfilteredEvents)
-	var eventBatches = make(chan []model.Event)
+	var eventBatches = make(chan []kubemodel.Event)
 	go EventBatcher{
-		Ctx:               ctx,
+		Ctx:               ginCtx,
 		ErrChan:           errChan,
 		Quant:             1 * time.Second,
 		BatchDrain:        eventBatches,
 		PreallocBatchSize: 16,
 		EventSource:       filteredEvents,
-		Сontrol:           control,
 	}.Run()
 
 	go func() {
 		defer control.Go()()
-
-		var limitOnce = sync.Once{}
 
 		pingTicker := ticker.NewTicker(1 * time.Second)
 		pingTicker.Start()
@@ -133,8 +130,8 @@ type EventBatcher struct {
 	Ctx                context.Context
 	ErrChan            chan error
 	Quant              time.Duration
-	EventSource        <-chan kubeModel.Event
-	BatchDrain         chan<- []kubeModel.Event
+	EventSource        <-chan kubemodel.Event
+	BatchDrain         chan<- []kubemodel.Event
 	Control            *gocontrol.Guard
 	PreallocBatchSize  int
 	FirstTimeWaitGroup *sync.WaitGroup
@@ -153,7 +150,7 @@ func (batcher EventBatcher) Run() {
 		ready()
 	}()
 
-	results := make([]kubeModel.Event, 0)
+	results := make([]kubemodel.Event, 0)
 	var timer = ticker.NewTicker(batcher.Quant)
 	timer.Start()
 	defer timer.Stop()
@@ -167,7 +164,7 @@ func (batcher EventBatcher) Run() {
 				continue
 			}
 			finalChan <- results
-			results = make([]kubeModel.Event, 0)
+			results = make([]kubemodel.Event, 0)
 		case event, ok := <-resultChan:
 			if !ok {
 				return
@@ -181,7 +178,7 @@ type EventAggregator struct {
 	CTX                context.Context
 	Params             model.FuncParams
 	EventSource        model.EventsFunc
-	EventDrain         chan<- kubeModel.Event
+	EventDrain         chan<- kubemodel.Event
 	ErrChan            chan<- error
 	Control            *gocontrol.Guard
 	DBPeriod           time.Duration
