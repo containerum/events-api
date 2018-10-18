@@ -22,27 +22,27 @@ func NewLogrusAdapter(e *logrus.Entry) *LogrusAdapter {
 
 // Log(err).Errorf("unable to destroy Earth due Batman issues")
 // Log(err, logger).Errorf("not enough energy units in the Death Star")
-func Log(err *cherry.Err, optionalLogger ...logrus.FieldLogger) *logrus.Entry {
+func Log(err * cherry.Err, optionalLogger ... logrus.FieldLogger) *logrus.Entry {
 	var logger = func() logrus.FieldLogger {
 		if len(optionalLogger) > 0 {
 			return optionalLogger[0]
 		}
-		return logrus.StandardLogger()
+		return  logrus.StandardLogger()
 	}()
 	fields := make(map[string]interface{}, len(err.Fields))
 	for k, v := range err.Fields {
 		fields[k] = v
 	}
 	entry := logger.WithFields(fields).
-		WithField("kind", err.ID.Kind).
-		WithField("sid", err.ID.SID).
+		WithField("kind", err.ID.Kind) .
+		WithField("sid", err.ID.SID) .
 		WithField("status-http", err.StatusHTTP)
 	if entry.Message == "" {
-		entry.Message = err.Message + func() string {
-			if len(err.Details) > 0 {
-				return ": " + strings.Join(err.Details, ";")
+		entry.Message = err.Message  + func() string {
+			if	 len(err.Details)>0 {
+				return  ": " + strings.Join(err.Details, ";")
 			}
-			return ""
+			return  ""
 		}()
 	}
 	return entry

@@ -2,6 +2,7 @@ package httputil
 
 import (
 	"github.com/gin-gonic/gin"
+
 )
 
 type Masker interface {
