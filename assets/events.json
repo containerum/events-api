@@ -1,0 +1,378 @@
+[
+  {
+    "name": "VolumeMismatch",
+    "openshift_desc": "Volume size or class is different from what is requested in claim.",
+    "example_message": "Volume's size is smaller than requested or volume's class does not match with claim",
+    "group": "Volume size or class is different from what is requested in claim.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": false
+  },
+  {
+    "name": "NetworkNotReady ",
+    "openshift_desc": "Network is not ready.",
+    "example_message": "network is not ready: [runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:docker: network plugin is not ready: Kubenet does not have netConfig. This is most likely due to lack of PodCIDR]",
+    "group": "admin: real msg text\nuser: \"Network is not ready\"",
+    "comment": "Pod event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ResourceDeleted",
+    "openshift_desc": "",
+    "example_message": "",
+    "group": "",
+    "comment": "",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedAttachVolume  ",
+    "openshift_desc": "Failed to attach volume.",
+    "example_message": "Multi-Attach error for volume \\\"pvc-2f53fe7e-846c-11e7-addd-0050569ccb52\\\" Volume is already exclusively attached to one node and can't be attached to another",
+    "group": "Failed to attach volume.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "StartedContainer ",
+    "openshift_desc": "Container started.",
+    "example_message": "Started container",
+    "group": "Container started.",
+    "comment": "Container event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedToStartContainer",
+    "openshift_desc": "Pull/Create/Start failed.",
+    "example_message": "Error: failed to start container \"test\": Error response from daemon: cannot join network of a non running container: d65a379339103732b60e3ef8d1bf340a6eff268102cfbd4d490e8b6c9c615f13",
+    "group": "Failed to create container",
+    "comment": "Container event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedDetachVolume ",
+    "openshift_desc": "Failed to detach volume.",
+    "example_message": "",
+    "group": "Failed to detach volume.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "NodeSelectorMismatching",
+    "openshift_desc": "Node selector mismatch.",
+    "example_message": "",
+    "group": "Node selector mismatch.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedToCreateContainer",
+    "openshift_desc": "Pull/Create/Start failed.",
+    "example_message": "",
+    "group": "Failed to create container",
+    "comment": "Container event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "SuccessfulMountVolume",
+    "openshift_desc": "Volume is successfully mounted.",
+    "example_message": "MountVolume.SetUp succeeded for volume \"volume-0\"",
+    "group": "Volume is successfully mounted.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "PullingImage",
+    "openshift_desc": "Pulling the image.",
+    "example_message": "pulling image \"containerum/kube-events:v1.0.1-rc.11\"",
+    "group": "Pulling the image.",
+    "comment": "Image event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedToPullImage",
+    "openshift_desc": "Failed to pull the image.",
+    "example_message": "Failed to pull image \"containerum/events-api:v0.0.13\": rpc error: code = Unknown desc = manifest for docker.io/containerum/events-api:v0.0.13 not found ИЛИ Error: ErrImagePull ИЛИ Error: ImagePullBackOff",
+    "group": "Failed to pull the image.",
+    "comment": "Image event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedUnMountVolume",
+    "openshift_desc": "Failed to unmount volume.",
+    "example_message": "",
+    "group": "Failed to unmount volume.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ImageGCFailed",
+    "openshift_desc": "Image garbage collection failed.",
+    "example_message": "operation timeout: context deadline exceeded",
+    "group": "admin: real msg text\nuser: \"system error\"",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "NodeNotReady",
+    "openshift_desc": "Node is not ready.",
+    "example_message": "Node ip-XX-XX-XX-XX.ec2.internal status is now: NodeNotReady",
+    "group": "Node is not ready.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "Scheduled",
+    "openshift_desc": "Successfully assigned \u003cpod-name\u003e to \u003cnode-name\u003e.",
+    "example_message": "Successfully assigned hosting/kube-events-56475fb6c6-m8xl5 to s1.sand",
+    "group": "Successfully assigned \u003cpod-name\u003e to \u003cnode-name\u003e.",
+    "comment": "",
+    "is_frequent": true
+  },
+  {
+    "name": "ExceededGracePeriod",
+    "openshift_desc": "Container runtime did not stop the pod within specified grace period.",
+    "example_message": "Container runtime did not kill the pod within specified grace period.",
+    "group": "Failed to stop a pod.",
+    "comment": "Container event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ContainerUnhealthy",
+    "openshift_desc": "Container is unhealthy.",
+    "example_message": "Readiness probe failed: 192.168.1.4:5432 - rejecting connections",
+    "group": "Container is unhealthy.",
+    "comment": "Probe event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "SuccessfulUnMountVolume",
+    "openshift_desc": "Volume is successfully unmounted.",
+    "example_message": "",
+    "group": "Volume is successfully unmounted.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "VolumeResizeSuccess",
+    "openshift_desc": "Successfully expanded/reduced volume.",
+    "example_message": "ExpandVolume succeeded for volume efeac6b6-2a40-4efc-8c29-e19aa16d2758/vol1",
+    "group": "",
+    "comment": "kubelet event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FreeDiskSpaceFailed",
+    "openshift_desc": "Free disk space failed.",
+    "example_message": "failed to garbage collect required amount of images. Wanted to free 6312950988, but freed 0",
+    "group": "Free disk space failed.",
+    "comment": "Image manager event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ProvisioningFailed",
+    "openshift_desc": "Failed to provision volume.",
+    "example_message": "StorageClass \"standard\" not found",
+    "group": "Failed to provision volume.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": true
+  },
+  {
+    "name": "WarnAlreadyMountedVolume ",
+    "openshift_desc": "Volume is already mounted.",
+    "example_message": "",
+    "group": "Volume is already mounted.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ResourceModified",
+    "openshift_desc": "",
+    "example_message": "",
+    "group": "",
+    "comment": "",
+    "is_frequent": true
+  },
+  {
+    "name": "VolumeFailedRecycle",
+    "openshift_desc": "Error creating recycler pod.",
+    "example_message": "Recycle failed: pod failed, pod.Status.Message unknown.",
+    "group": "Error creating recycler pod.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": false
+  },
+  {
+    "name": "InvalidDiskCapacity",
+    "openshift_desc": "Invalid disk capacity.",
+    "example_message": "invalid capacity 0 on device \"\" at mount point \"\"",
+    "group": "Invalid disk capacity.",
+    "comment": "Image manager event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "BackOffStartContainer",
+    "openshift_desc": "Back-off restarting failed the container.",
+    "example_message": "",
+    "group": "Failed to create container",
+    "comment": "Container event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedBinding",
+    "openshift_desc": "There are no persistent volumes available and no storage class is set.",
+    "example_message": "no persistent volumes available for this claim and no storage class is set",
+    "group": "There are no persistent volumes available and no storage class is set.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": true
+  },
+  {
+    "name": "ErrImageNeverPullPolicy",
+    "openshift_desc": "The image’s NeverPull Policy is violated.",
+    "example_message": "Container image \"cnginx:v1\" is not present with pull policy of Never",
+    "group": "The image’s NeverPull Policy is violated.",
+    "comment": "Image event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedCreatePodSandBox",
+    "openshift_desc": "Failed to create pod sandbox.",
+    "example_message": "Failed create pod sandbox: rpc error: code = Unknown desc = failed to start sandbox container for pod \"nonexistent-grasshopper-events-api-65597d669f-hvjqh\": Error response from daemon: transport is closing",
+    "group": "Failed to create container",
+    "comment": "",
+    "is_frequent": true
+  },
+  {
+    "name": "ExternalProvisioning",
+    "openshift_desc": "Occurs when volume for the claim is provisioned either manually or via external software.",
+    "example_message": "cannot find provisioner \"ubiquity/flex\", expecting that a volume for the claim is provisioned either manually or via external software",
+    "group": "Occurs when volume for the claim is provisioned either manually or via external software.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedToKillPod ",
+    "openshift_desc": "Failed to stop a pod.",
+    "example_message": "error killing pod: [failed to \"KillContainer\" for \"k8szk\" with KillContainerError: \"rpc error: code = Unknown desc = Error response from daemon: Cannot stop container ",
+    "group": "Failed to stop a pod.",
+    "comment": "Pod event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ProvisioningSucceeded",
+    "openshift_desc": "Occurs when the volume is provisioned successfully.",
+    "example_message": "Successfully provisioned volume pvc-bee8c30a-d6a3-11e7-9af0-42010a800002 using kubernetes.io/gce-pd",
+    "group": "",
+    "comment": "volume relevant event reasons",
+    "is_frequent": true
+  },
+  {
+    "name": "BackOffPullImage",
+    "openshift_desc": "Back off Ctr Start, image pull.",
+    "example_message": "Back-off pulling image \"registry.containerum.net/ch/exonlab-site:ru-bb741c06\"",
+    "group": "Back off Ctr Start, image pull.",
+    "comment": "Image event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedToInspectImage",
+    "openshift_desc": "Failed to inspect the image.",
+    "example_message": "Failed to apply default image tag \"microsoft/\": couldn't parse image reference \"microsoft/\": invalid reference format",
+    "group": "Failed to inspect the image.",
+    "comment": "Image event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "VolumeResizeFailed",
+    "openshift_desc": "Failed to expand/reduce volume.",
+    "example_message": "Volume has no storage class",
+    "group": "Failed to expand/reduce volume.",
+    "comment": "kubelet event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "NodeReady",
+    "openshift_desc": "Node is ready.",
+    "example_message": "Node k8s-master-33434527-0 status is now: NodeReady",
+    "group": "Node is ready.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "VolumeFailedDelete",
+    "openshift_desc": "Error when deleting the volume.",
+    "example_message": "Volume has no class annotation",
+    "group": "Error when deleting the volume.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": false
+  },
+  {
+    "name": "PreemptContainer",
+    "openshift_desc": "Preempting other pods.",
+    "example_message": "",
+    "group": "Preempting other pods.",
+    "comment": "Container event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedMountVolume",
+    "openshift_desc": "Volume mount failed.",
+    "example_message": "Unable to mount volumes for pod \"mypod_default(0d57f079-d709-11e7-94c9-00163e30bcc9)\": timeout expired waiting for volumes to attach/mount for pod \"default\"/\"mypod\". list of unattached/unmounted volumes=[mypd]",
+    "group": "Volume mount failed.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ProvisioningCleanupFailed",
+    "openshift_desc": "Error cleaning provisioned volume.",
+    "example_message": "",
+    "group": "Error cleaning provisioned volume.",
+    "comment": "volume relevant event reasons",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedToCreatePodContainer ",
+    "openshift_desc": "Failed to create a pod contianer.",
+    "example_message": "unable to ensure pod container exists: failed to create container for /kubepods/besteffort/pod27bb0edc-c0b0-11e8-be7f-941882782994 : dbus: connection closed by user",
+    "group": "Failed to create container",
+    "comment": "Pod event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedSync ",
+    "openshift_desc": "Pod sync failed.",
+    "example_message": "Error syncing pod, skipping: configmaps \"nginx-template\" not found",
+    "group": "Pod sync failed.",
+    "comment": "Pod worker event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "FailedScheduling",
+    "openshift_desc": "Failed to schedule pod: \u003cpod-namespace\u003e/\u003cpod-name\u003e. This event is raised for multiple reasons, for example: AssumePodVolumes failed, Binding rejected etc.",
+    "example_message": "",
+    "group": "Failed to create container",
+    "comment": "",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedToMakePodDataDirectories ",
+    "openshift_desc": "Failed to make pod data directories.",
+    "example_message": "",
+    "group": "Failed to create container",
+    "comment": "Pod event reason list",
+    "is_frequent": true
+  },
+  {
+    "name": "FailedMapVolume",
+    "openshift_desc": "Failed to map a volume.",
+    "example_message": "MapVolume.AttachFileDevice failed for volume \"local-pv-9cf54093\" : exit status 1",
+    "group": "Failed to map a volume.",
+    "comment": "kubelet event reason list",
+    "is_frequent": false
+  },
+  {
+    "name": "ResourceCreated",
+    "openshift_desc": "",
+    "example_message": "",
+    "group": "",
+    "comment": "",
+    "is_frequent": true
+  }
+]
