@@ -33,16 +33,31 @@ func withWS(ginCtx *gin.Context, params model.FuncParams, dbPeriod time.Duration
 
 	var filter eventfilter.Predicate = eventfilter.True
 	var userDefinedLevelWhiteList = ginCtx.QueryArray("levels")
-	if len(userDefinedLevelWhiteList) > 0 {
+	var userDefinedSourceWhiteList = ginCtx.QueryArray("resources")
+
+	if len(userDefinedLevelWhiteList) > 0 || len(userDefinedSourceWhiteList) > 0 {
 		var levelWhiteList = func() []kubemodel.EventKind {
-			var levels = ginCtx.QueryArray("levels")
-			var kinds = make([]kubemodel.EventKind, 0, len(levels))
-			for _, level := range levels {
+			var kinds = make([]kubemodel.EventKind, 0, len(userDefinedLevelWhiteList))
+			for _, level := range userDefinedLevelWhiteList {
 				kinds = append(kinds, kubemodel.EventKind(level))
 			}
 			return kinds
 		}()
-		filter = eventfilter.MatchAnyKind(levelWhiteList...)
+
+		var resourceWhiteList = func() []kubemodel.ResourceType {
+			var resources = make([]kubemodel.ResourceType, 0, len(userDefinedSourceWhiteList))
+			for _, resource := range userDefinedSourceWhiteList {
+				resources = append(resources, kubemodel.ResourceType(resource))
+			}
+			return resources
+		}()
+
+		if len(userDefinedLevelWhiteList) > 0 {
+			filter = eventfilter.MatchAnyKind(levelWhiteList...)
+		}
+		if len(userDefinedSourceWhiteList) > 0 {
+			filter = eventfilter.And(filter, eventfilter.MatchAnyType(resourceWhiteList...))
+		}
 	}
 
 	conn, err := upgrader.Upgrade(ginCtx.Writer, ginCtx.Request, nil)
