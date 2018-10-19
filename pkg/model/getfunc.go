@@ -13,6 +13,8 @@ type FuncParams struct {
 	UserNamespaces []string
 	Limit          int
 	StartTime      time.Time
+	Page           int
+	PageSize       int
 }
 
 type EventsFunc func(params FuncParams) (*model.EventsList, error)

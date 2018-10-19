@@ -6,6 +6,7 @@ import (
 )
 
 type EventsActions interface {
+	GetPaginatedEvents(params model.FuncParams) (*kubeModel.EventsList, error)
 	GetNamespaceChanges(params model.FuncParams) (*kubeModel.EventsList, error)
 	GetAllNamespacesChanges(params model.FuncParams) (*kubeModel.EventsList, error)
 

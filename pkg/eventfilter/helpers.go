@@ -41,3 +41,20 @@ func MatchAnyType(resourceTypes ...model.ResourceType) Predicate {
 		return false
 	}
 }
+
+func EqResourceName(name string) Predicate {
+	return func(event model.Event) bool {
+		return event.ResourceName == name
+	}
+}
+
+func MatchResourceName(names ...string) Predicate {
+	return func(event model.Event) bool {
+		for _, name := range names {
+			if name == event.ResourceName {
+				return true
+			}
+		}
+		return false
+	}
+}
