@@ -1,10 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/containerum/events-api/pkg/eaerrors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/containerum/events-api/pkg/model"
 	"github.com/containerum/utils/httputil"
@@ -107,6 +111,41 @@ func (h *EventsHandlers) AllNamespaceResourcesChangesEventsHandler(ctx *gin.Cont
 //    $ref: '#/responses/error'
 func (h *EventsHandlers) SelectedNamespaceResourcesChangesEventsHandler(ctx *gin.Context) {
 	withWS(ctx, createParams(ctx), h.DBPeriod, h.getEventsFuncs(false, true, strings.Split(ctx.Query("res"), ",")...)...)
+}
+
+// swagger:operation GET /namespaces/ AllEvents AllNamespaceResourcesChangesEventsPaginatedHandler
+// Get selected events in namespace.
+//
+// ---
+// x-method-visibility: public
+// parameters:
+//  - $ref: '#/parameters/UserRoleHeader'
+//  - $ref: '#/parameters/UserIDHeader'
+//  - name: page
+//    in: query
+//    type: int
+//    required: false
+//  - name: page_size
+//    in: query
+//    type: integer
+//    required: false
+// responses:
+//  '200':
+//    description: page with events
+//    schema:
+//      $ref: '#/definitions/EventsList'
+//  default:
+//    $ref: '#/responses/error'
+func (h *EventsHandlers) AllNamespaceResourcesChangesEventsPaginatedHandler(ctx *gin.Context) {
+	var params = createParams(ctx)
+	var events, getPaginatedEventsErr = h.GetPaginatedEvents(params)
+	if getPaginatedEventsErr != nil {
+		logrus.WithError(getPaginatedEventsErr).Errorf("unable to get paginated event list: %v", params)
+		ctx.AbortWithError(http.StatusInternalServerError, eaerrors.ErrInternal().AddDetails(
+			"unable to get paginated event list",
+			fmt.Sprint(params)))
+	}
+	ctx.JSON(http.StatusOK, events)
 }
 
 // swagger:operation GET /all AllEvents AllResourcesChangesEvents
@@ -222,6 +261,8 @@ func createParams(ctx *gin.Context) model.FuncParams {
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	startTime, _ := time.Parse(time.RFC3339, ctx.Query("time"))
 	isAdmin := httputil.MustGetUserRole(ctx.Request.Context()) == m.RoleAdmin
+	var page, _ = strconv.Atoi(ctx.Query("page"))
+	var pageSize, _ = strconv.Atoi(ctx.Query("page_size"))
 
 	var namespaces []string
 	if !isAdmin {
@@ -237,5 +278,7 @@ func createParams(ctx *gin.Context) model.FuncParams {
 		StartTime:      startTime,
 		UserAdmin:      isAdmin,
 		UserNamespaces: namespaces,
+		Page:           page,
+		PageSize:       pageSize,
 	}
 }
