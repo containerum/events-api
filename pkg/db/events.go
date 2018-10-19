@@ -49,7 +49,7 @@ func (mongo *MongoStorage) GetEventsInNamespacesList(resourcetype model.Resource
 // If pageN < 0, then uses default value 0.
 // If pageSize < 1, then uses default value 32
 // Results are sorted from newest to oldest.
-func (mongo *MongoStorage) GetEventsInNamespacesListPaginated(resourcetype model.ResourceType, pageN, pageSize int, namespaces ...string) ([]model.Event, error) {
+func (mongo *MongoStorage) GetEventsInNamespacesListPaginated(pageN, pageSize int, namespaces ...string) ([]model.Event, error) {
 	if pageN < 0 {
 		pageN = 0
 	}
@@ -63,7 +63,6 @@ func (mongo *MongoStorage) GetEventsInNamespacesListPaginated(resourcetype model
 		"resourcenamespace": bson.M{
 			"$in": namespaces,
 		},
-		"resourcetype": resourcetype,
 	}).Sort("-eventtime").Skip(pageN * pageSize).Limit(pageSize).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get events page %d(%d per page) in namespace", pageN, pageSize)
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
