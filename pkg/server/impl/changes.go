@@ -21,6 +21,14 @@ func (ea *EventsActionsImpl) GetNamespaceChanges(params model.FuncParams) (*kube
 	return &kubeModel.EventsList{Events: changes}, nil
 }
 
+func (ea *EventsActionsImpl) GetPaginatedEvents(params model.FuncParams) (*kubeModel.EventsList, error) {
+	var events, err = ea.mongo.GetEventsInNamespacesListPaginated(params.Page, params.PageSize, params.UserNamespaces...)
+	if err != nil {
+		return &kubeModel.EventsList{}, err
+	}
+	return &kubeModel.EventsList{Events: events}, nil
+}
+
 func (ea *EventsActionsImpl) GetAllNamespacesChanges(params model.FuncParams) (*kubeModel.EventsList, error) {
 	ea.log.Debugln("Getting all namespaces changes")
 
