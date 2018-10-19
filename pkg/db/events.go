@@ -49,7 +49,7 @@ func (mongo *MongoStorage) GetEventsInNamespacesList(resourcetype model.Resource
 // If pageN < 0, then uses default value 0.
 // If pageSize < 1, then uses default value 32
 // Results are sorted from newest to oldest.
-func (mongo *MongoStorage) GetEventsInNamespacesListPage(resourcetype model.ResourceType, pageN, pageSize int, namespaces ...string) ([]model.Event, error) {
+func (mongo *MongoStorage) GetEventsInNamespacesListPaginated(resourcetype model.ResourceType, pageN, pageSize int, namespaces ...string) ([]model.Event, error) {
 	if pageN < 0 {
 		pageN = 0
 	}
