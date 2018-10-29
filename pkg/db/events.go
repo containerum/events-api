@@ -64,7 +64,8 @@ func (mongo *MongoStorage) GetEventsInNamespacesListPaginated(pageN, pageSize in
 		query = bson.M{
 		"resourcenamespace": bson.M{
 			"$in": namespaces,
-		}}
+			}
+		}
 	}
 	if err := collection.Find(query).Sort("-eventtime").Skip(pageN * pageSize).Limit(pageSize).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get events page %d(%d per page) in namespace", pageN, pageSize)
