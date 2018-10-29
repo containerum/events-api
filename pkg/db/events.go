@@ -59,11 +59,14 @@ func (mongo *MongoStorage) GetEventsInNamespacesListPaginated(pageN, pageSize in
 	mongo.logger.WithField("collection", mongodb.EventsCollection).Debugf("getting events page %d(%d per page) in namespace", pageN, pageSize)
 	var collection = mongo.db.C(mongodb.EventsCollection)
 	result := make([]model.Event, 0)
-	if err := collection.Find(bson.M{
+	var query =  bson.M{}
+	if len(namespaces) != 0 {
+		query = bson.M{
 		"resourcenamespace": bson.M{
 			"$in": namespaces,
-		},
-	}).Sort("-eventtime").Skip(pageN * pageSize).Limit(pageSize).All(&result); err != nil {
+		}}
+	}
+	if err := collection.Find(query).Sort("-eventtime").Skip(pageN * pageSize).Limit(pageSize).All(&result); err != nil {
 		mongo.logger.WithError(err).Errorf("unable to get events page %d(%d per page) in namespace", pageN, pageSize)
 		return nil, PipErr{error: err}.ToMongerr().NotFoundToNil().Extract()
 	}
