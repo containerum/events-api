@@ -1,5 +1,5 @@
-# Events API for Containerum Platform
-Events API is an API that formats events data from the DB and passes it to [Containerum Platform](https://github.com/containerum/containerum).
+# Events API for Containerum
+Events API is an API that formats events data from the DB and passes it to [Containerum](https://github.com/containerum/containerum).
 
 ## Prerequisites
 * Kubernetes
